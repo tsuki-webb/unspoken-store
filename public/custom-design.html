@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Custom Design Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand.css">
+<link rel="stylesheet" href="custom-design.css">
+</head>
+<body class="custom-design-page">
+
+<header class="custom-nav">
+    <a class="custom-logo" href="index.html" aria-label="Home">
+        <img class="brand-logo" src="assets/logo/unspoken-store-logo.svg" alt="Store logo">
+    </a>
+
+    <nav class="custom-nav-links" aria-label="Primary">
+        <a href="men.html">MEN</a>
+        <a href="women.html">WOMEN</a>
+        <a href="unisex.html">UNISEX</a>
+        <a href="index.html#customStudioSection">BACK TO HOME</a>
+    </nav>
+
+    <a class="custom-cart-link" href="cart.html" aria-label="Open cart">
+        <span aria-hidden="true">&#128722;</span>
+        <span class="cart-count-badge hidden" data-cart-count>0</span>
+    </a>
+</header>
+
+<main class="custom-main">
+    <section class="custom-hero" id="designWorkflow">
+        <div class="custom-hero-copy">
+            <p class="custom-hero-kicker">CUSTOM ORDER STUDIO</p>
+            <h1>Build Your Own T-Shirt, Production-Ready</h1>
+            <p>
+                Submit your design assets, choose fit and print positions, set size-wise quantities,
+                and share special production instructions in one professional brief.
+            </p>
+
+            <div class="custom-steps">
+                <span>1. Upload Artwork</span>
+                <span>2. Configure Front / Back Prints</span>
+                <span>3. Submit Sizes + Instructions</span>
+            </div>
+        </div>
+
+        <div class="custom-hero-media">
+            <img
+                src="https://images.unsplash.com/photo-1503341960582-b45751874dd0?auto=format&fit=crop&w=1200&q=80"
+                alt="Custom t-shirt mockup process"
+            >
+        </div>
+    </section>
+
+    <form id="customDesignForm" class="custom-form" enctype="multipart/form-data" novalidate>
+        <input type="hidden" name="sourcePage" value="custom-design">
+        <input type="hidden" id="quantityInput" name="quantity" value="0">
+
+        <div class="custom-form-layout">
+            <div class="custom-form-column">
+                <section class="form-card">
+                    <div class="form-card-head">
+                        <h2>Contact Details</h2>
+                        <p>We use this to confirm artwork and production timelines.</p>
+                    </div>
+
+                    <div class="form-grid two">
+                        <label>
+                            Full Name
+                            <input name="customerName" type="text" required placeholder="Your full name">
+                        </label>
+
+                        <label>
+                            Phone / WhatsApp
+                            <input name="phone" type="tel" required placeholder="+91 98XXXXXXXX">
+                        </label>
+
+                        <label class="full">
+                            Email
+                            <input name="email" type="email" required placeholder="you@example.com">
+                        </label>
+                    </div>
+                </section>
+
+                <section class="form-card">
+                    <div class="form-card-head">
+                        <h2>T-Shirt Configuration</h2>
+                        <p>Choose garment base, color direction, and print placement.</p>
+                    </div>
+
+                    <div class="form-grid two">
+                        <label>
+                            Collection
+                            <select name="targetGender" id="targetGenderSelect">
+                                <option value="men">Men</option>
+                                <option value="women">Women</option>
+                                <option value="unisex" selected>Unisex</option>
+                            </select>
+                        </label>
+
+                        <label>
+                            T-Shirt Type
+                            <select name="tshirtFit" id="tshirtFitSelect" required>
+                                <option value="oversized">Oversized</option>
+                                <option value="regular">Regular</option>
+                            </select>
+                        </label>
+
+                        <label>
+                            Base Color Preference
+                            <input id="baseColorInput" name="baseColor" type="text" list="baseColorOptions" value="Black" placeholder="Black, White, Beige, etc.">
+                            <datalist id="baseColorOptions">
+                                <option value="Black"></option>
+                                <option value="White"></option>
+                                <option value="Navy"></option>
+                                <option value="Charcoal"></option>
+                                <option value="Beige"></option>
+                                <option value="Olive"></option>
+                                <option value="Maroon"></option>
+                                <option value="Sky"></option>
+                                <option value="Mint"></option>
+                                <option value="Lavender"></option>
+                            </datalist>
+                        </label>
+
+                        <label>
+                            Material Preference
+                            <input name="materialPreference" type="text" placeholder="Cotton GSM / Blend (optional)">
+                        </label>
+                    </div>
+
+                    <div class="base-color-quick-pick">
+                        <p class="field-label">Quick Color Picks</p>
+                        <div class="color-chip-row" id="baseColorSwatches" role="radiogroup" aria-label="Base color quick picks">
+                            <button type="button" class="color-swatch active" data-color="Black" data-hex="#111111"><span style="background:#111111;"></span>Black</button>
+                            <button type="button" class="color-swatch" data-color="White" data-hex="#f4f4f4"><span style="background:#f4f4f4;"></span>White</button>
+                            <button type="button" class="color-swatch" data-color="Navy" data-hex="#1f2b4d"><span style="background:#1f2b4d;"></span>Navy</button>
+                            <button type="button" class="color-swatch" data-color="Charcoal" data-hex="#2f3438"><span style="background:#2f3438;"></span>Charcoal</button>
+                            <button type="button" class="color-swatch" data-color="Beige" data-hex="#d4c3a4"><span style="background:#d4c3a4;"></span>Beige</button>
+                            <button type="button" class="color-swatch" data-color="Olive" data-hex="#5d6a41"><span style="background:#5d6a41;"></span>Olive</button>
+                            <button type="button" class="color-swatch" data-color="Maroon" data-hex="#6a2230"><span style="background:#6a2230;"></span>Maroon</button>
+                            <button type="button" class="color-swatch" data-color="Sky" data-hex="#8cb7de"><span style="background:#8cb7de;"></span>Sky</button>
+                            <button type="button" class="color-swatch" data-color="Mint" data-hex="#8bc9b0"><span style="background:#8bc9b0;"></span>Mint</button>
+                            <button type="button" class="color-swatch" data-color="Lavender" data-hex="#b4addf"><span style="background:#b4addf;"></span>Lavender</button>
+                        </div>
+                    </div>
+
+                    <div class="print-sides-wrap">
+                        <p class="field-label">Print Sides</p>
+                        <div class="print-sides" id="printSidesGroup">
+                            <label>
+                                <input type="radio" name="printSides" value="front" checked>
+                                <span>Front Only</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="printSides" value="both">
+                                <span>Front + Back</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="printSides" value="back">
+                                <span>Back Only</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-grid two">
+                        <label>
+                            Front Placement
+                            <select name="frontPlacement">
+                                <option value="center-chest">Center Chest</option>
+                                <option value="left-chest">Left Chest</option>
+                                <option value="full-front">Full Front</option>
+                                <option value="neck-label">Neck Label</option>
+                                <option value="custom">Custom Placement</option>
+                            </select>
+                        </label>
+
+                        <label id="backPlacementField">
+                            Back Placement
+                            <select name="backPlacement">
+                                <option value="upper-back">Upper Back</option>
+                                <option value="full-back">Full Back</option>
+                                <option value="neck-label">Neck Label</option>
+                                <option value="custom">Custom Placement</option>
+                            </select>
+                        </label>
+
+                        <label class="full">
+                            Placement Notes
+                            <textarea name="placementNotes" rows="3" placeholder="Example: Keep front logo 3 inches below collar."></textarea>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="form-card">
+                    <div class="form-card-head">
+                        <h2>Design Upload</h2>
+                        <p>Upload print-ready files for front/back and optional references.</p>
+                    </div>
+
+                    <div class="form-grid two">
+                        <label>
+                            Front Design File
+                            <input id="frontDesignInput" name="frontDesign" type="file" accept="image/*">
+                        </label>
+
+                        <label id="backDesignField">
+                            Back Design File
+                            <input id="backDesignInput" name="backDesign" type="file" accept="image/*">
+                        </label>
+
+                        <label class="full">
+                            Extra Reference Files
+                            <input id="referenceDesignsInput" name="referenceDesigns" type="file" multiple accept="image/*">
+                        </label>
+                    </div>
+
+                    <div class="file-preview" id="filePreviewList"></div>
+                </section>
+            </div>
+
+            <aside class="custom-form-column">
+                <section class="form-card">
+                    <div class="form-card-head">
+                        <h2>Size & Quantity</h2>
+                        <p>Enter exact size split for your order.</p>
+                    </div>
+
+                    <div class="size-grid">
+                        <label>XS<input class="size-input" name="sizeXs" type="number" min="0" value="0"></label>
+                        <label>S<input class="size-input" name="sizeS" type="number" min="0" value="0"></label>
+                        <label>M<input class="size-input" name="sizeM" type="number" min="0" value="0"></label>
+                        <label>L<input class="size-input" name="sizeL" type="number" min="0" value="0"></label>
+                        <label>XL<input class="size-input" name="sizeXl" type="number" min="0" value="0"></label>
+                        <label>XXL<input class="size-input" name="sizeXxl" type="number" min="0" value="0"></label>
+                        <label>XXXL<input class="size-input" name="sizeXxxl" type="number" min="0" value="0"></label>
+                    </div>
+
+                    <div class="total-quantity">
+                        <span>Total Quantity</span>
+                        <strong id="totalQuantityValue">0</strong>
+                    </div>
+                </section>
+
+                <section class="form-card">
+                    <div class="form-card-head">
+                        <h2>Timeline & Notes</h2>
+                        <p>Share expected delivery and any production instruction.</p>
+                    </div>
+
+                    <div class="form-grid one">
+                        <label>
+                            Target Delivery Date
+                            <input name="deliveryTargetDate" type="date">
+                        </label>
+
+                        <label>
+                            Budget (Optional)
+                            <input name="budget" type="text" placeholder="Example: 700 - 900 per piece">
+                        </label>
+
+                        <label>
+                            Special Instructions
+                            <textarea name="specialInstructions" rows="4" placeholder="Mention print method, color accuracy, packaging notes, etc."></textarea>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="form-card tshirt-preview-card">
+                    <div class="form-card-head">
+                        <h2>T-Shirt Preview</h2>
+                        <p>Live front/back mockups with your selected color, fit, and uploaded design files.</p>
+                    </div>
+
+                    <div class="tshirt-preview-wrap">
+                        <div class="tshirt-preview-row">
+                            <article class="tshirt-preview-card-item" id="previewFrontCard">
+                                <div class="tshirt-preview-card-head">
+                                    <strong>Front View</strong>
+                                    <span class="preview-side-state" id="previewFrontState">Selected</span>
+                                </div>
+
+                                <div class="tshirt-preview-canvas" id="previewFrontCanvas">
+                                    <div class="tshirt-preview-sleeve left"></div>
+                                    <div class="tshirt-preview-sleeve right"></div>
+                                    <div class="tshirt-preview-body">
+                                        <div class="tshirt-preview-neck"></div>
+                                        <div class="tshirt-design-layer">
+                                            <img id="previewFrontDesignImage" alt="Front design preview" class="hidden">
+                                            <span class="tshirt-design-placeholder" id="previewFrontDesignPlaceholder">Upload front design</span>
+                                        </div>
+                                        <span class="tshirt-preview-fit" id="previewFrontFitBadge">OVERSIZED</span>
+                                        <span class="tshirt-preview-size" id="previewFrontSizeBadge">M</span>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="tshirt-preview-card-item" id="previewBackCard">
+                                <div class="tshirt-preview-card-head">
+                                    <strong>Back View</strong>
+                                    <span class="preview-side-state" id="previewBackState">Not Selected</span>
+                                </div>
+
+                                <div class="tshirt-preview-canvas back" id="previewBackCanvas">
+                                    <div class="tshirt-preview-sleeve left"></div>
+                                    <div class="tshirt-preview-sleeve right"></div>
+                                    <div class="tshirt-preview-body">
+                                        <div class="tshirt-preview-neck"></div>
+                                        <div class="tshirt-design-layer">
+                                            <img id="previewBackDesignImage" alt="Back design preview" class="hidden">
+                                            <span class="tshirt-design-placeholder" id="previewBackDesignPlaceholder">Upload back design</span>
+                                        </div>
+                                        <span class="tshirt-preview-fit" id="previewBackFitBadge">OVERSIZED</span>
+                                        <span class="tshirt-preview-size" id="previewBackSizeBadge">M</span>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+
+                        <ul class="tshirt-preview-stats">
+                            <li><span>Fit</span><strong id="previewMetaFit">Oversized</strong></li>
+                            <li><span>Color</span><strong id="previewMetaColor">Black</strong></li>
+                            <li><span>Print Sides</span><strong id="previewMetaSides">Front Only</strong></li>
+                            <li><span>Primary Size</span><strong id="previewMetaSize">M</strong></li>
+                            <li><span>Total Qty</span><strong id="previewMetaQty">0</strong></li>
+                        </ul>
+                    </div>
+
+                    <div class="preview-help-strip">
+                        <span>Front uses front upload or first reference file.</span>
+                        <span>Back uses back upload or first reference file.</span>
+                        <span>Switch print side to see active view states.</span>
+                    </div>
+
+                    <button id="savePresetBtn" type="button" class="save-preset-btn">Save Preset + Add to Cart</button>
+                    <p class="preset-note" id="presetNote">
+                        Your selected custom format will be saved and added to cart automatically.
+                    </p>
+                </section>
+
+                <section class="form-card summary-card">
+                    <h2>Live Summary</h2>
+                    <ul>
+                        <li><span>Type</span><strong id="summaryFit">Oversized</strong></li>
+                        <li><span>Base Color</span><strong id="summaryColor">Black</strong></li>
+                        <li><span>Primary Size</span><strong id="summaryPrimarySize">M</strong></li>
+                        <li><span>Print Sides</span><strong id="summarySides">Front Only</strong></li>
+                        <li><span>Quantity</span><strong id="summaryQuantity">0</strong></li>
+                    </ul>
+                </section>
+            </aside>
+        </div>
+
+        <div class="form-submit-row">
+            <label class="terms-check">
+                <input type="checkbox" id="orderTermsCheck" required>
+                <span>I confirm all details and design files are ready for production review.</span>
+            </label>
+
+            <button id="customDesignSubmitBtn" type="submit">Submit Custom Design Request</button>
+        </div>
+
+        <div class="form-message hidden" id="customDesignMessage" role="status" aria-live="polite"></div>
+    </form>
+</main>
+
+<script src="cart-core.js"></script>
+<script src="custom-design.js"></script>
+
+</body>
+</html>

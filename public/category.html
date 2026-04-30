@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Category</title>
+<link rel="stylesheet" href="brand.css">
+<link rel="stylesheet" href="collection.css">
+<link rel="stylesheet" href="category.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="collection-page category-page">
+
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<header class="collection-nav">
+    <a class="logo" href="index.html" aria-label="Home">
+        <img class="brand-logo" src="assets/logo/unspoken-store-logo.svg" alt="Store logo">
+    </a>
+    <nav class="collection-nav-links" aria-label="Collection navigation">
+        <a href="index.html">HOME</a>
+        <a href="men.html" data-nav="men">MEN</a>
+        <a href="women.html" data-nav="women">WOMEN</a>
+        <a href="unisex.html" data-nav="unisex">UNISEX</a>
+    </nav>
+    <a class="collection-cart-link" href="cart.html" aria-label="Open cart">
+        <span aria-hidden="true">&#128722;</span>
+        <span class="cart-count-badge hidden" data-cart-count>0</span>
+    </a>
+</header>
+
+<main class="collection-main category-main">
+    <section class="category-toolbar">
+        <div class="category-toolbar-head">
+            <div>
+                <p class="category-toolbar-kicker" id="categoryKicker">COLLECTION CATEGORY</p>
+                <h1 id="categoryPageTitle">Category</h1>
+                <p class="category-toolbar-subtitle" id="categoryPageSubtitle"></p>
+            </div>
+            <a class="category-back-link" id="backToCollectionBtn" href="men.html">Back to Collection</a>
+        </div>
+
+        <label class="category-search-field">
+            <span>Search In Category</span>
+            <input id="categorySearchInput" type="text" placeholder="Search products in this category">
+        </label>
+
+        <label class="category-sort-field">
+            <span>Sort</span>
+            <select id="categorySortSelect">
+                <option value="newest">Newest</option>
+                <option value="price_asc">Price: Low to High</option>
+                <option value="price_desc">Price: High to Low</option>
+                <option value="featured">Featured First</option>
+            </select>
+        </label>
+
+        <div class="category-subcategory-wrap hidden" id="categorySubcategoryWrap">
+            <span>T-Shirt Fit</span>
+            <div class="category-subcategory-chips" id="categorySubcategoryChips"></div>
+        </div>
+
+        <div class="category-toolbar-summary" id="categoryToolbarSummary">0 products</div>
+    </section>
+
+    <section class="category-page-strip">
+        <div class="category-page-strip-head">
+            <h2>More Categories</h2>
+        </div>
+        <div class="category-strip" id="categoryQuickLinks"></div>
+    </section>
+
+    <section class="category-products-wrap" id="categoryProductsWrap">
+        <div class="section-head">
+            <div>
+                <h2 id="categoryProductsHeading">Products</h2>
+                <p id="categoryProductsSubheading"></p>
+            </div>
+            <span class="section-count" id="categoryProductsCount">0 items</span>
+        </div>
+        <div class="products-grid" id="categoryProductsGrid"></div>
+    </section>
+
+    <section class="empty-state hidden" id="categoryEmpty">
+        <h3>No Products Found</h3>
+        <p>This category does not have products right now.</p>
+    </section>
+
+    <section class="error-state hidden" id="categoryError">
+        <h3>Category Unavailable</h3>
+        <p id="categoryErrorMessage">Unable to load this category right now.</p>
+    </section>
+
+    <footer class="collection-footer">
+        <strong class="brand-footer-mark"><img class="brand-logo" src="assets/logo/unspoken-store-logo.svg" alt="Store logo"></strong>
+        <span>Premium streetwear with curated drops and modular edits.</span>
+    </footer>
+</main>
+
+<button type="button" class="back-to-top" id="backToTopBtn" aria-label="Back to top">&#8593;</button>
+<div class="toast-host" id="toastHost"></div>
+
+<script src="cart-core.js"></script>
+<script src="category.js"></script>
+</body>
+</html>

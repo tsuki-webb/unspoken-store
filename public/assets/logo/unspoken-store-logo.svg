@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 170" role="img" aria-labelledby="title">
+  <title>Store Logo</title>
+  <g fill="#ff3a13">
+    <path d="M30 86 72 14h43L73 86l21 37H52Z"/>
+    <path d="M175 14 132 86l22 37h43l43-72Z"/>
+    <text x="235" y="48" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="46" font-weight="800" letter-spacing="10">THE</text>
+    <text x="235" y="92" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="46" font-weight="800" letter-spacing="10">UNSPOKEN</text>
+    <text x="235" y="136" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="46" font-weight="800" letter-spacing="10">STORE</text>
+  </g>
+</svg>

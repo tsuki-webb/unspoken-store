@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Admin Panel</title>
+
+<link rel="stylesheet" href="brand.css">
+<link rel="stylesheet" href="admin.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="logo" aria-label="Store">
+            <img class="brand-logo" src="assets/logo/unspoken-store-logo.svg" alt="Store logo">
+        </div>
+
+        <nav>
+            <button class="nav-btn active" data-panel="dashboard" onclick="switchPanel('dashboard', this)">Dashboard</button>
+            <button class="nav-btn" data-panel="products" onclick="switchPanel('products', this)">Products</button>
+            <button class="nav-btn" data-panel="banners" onclick="switchPanel('banners', this)">Banners</button>
+            <button class="nav-btn" data-panel="categorycards" onclick="switchPanel('categorycards', this)">Category Cards</button>
+            <button class="nav-btn" data-panel="customdesigns" onclick="switchPanel('customdesigns', this)">Custom Designs</button>
+            <button class="nav-btn" data-panel="orders" onclick="switchPanel('orders', this)">Orders</button>
+            <button class="nav-btn" data-panel="users" onclick="switchPanel('users', this)">Users</button>
+        </nav>
+
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <!-- ================= DASHBOARD ================= -->
+        <section id="dashboard" class="panel active">
+
+            <h1>Dashboard</h1>
+
+            <div class="stats">
+
+                <div class="card">
+                    <h3>Products</h3>
+                    <p id="totalProducts">0</p>
+                </div>
+
+                <div class="card">
+                    <h3>Banners</h3>
+                    <p id="totalBanners">0</p>
+                </div>
+
+                <div class="card">
+                    <h3>Users</h3>
+                    <p id="totalUsers">0</p>
+                </div>
+
+                <div class="card">
+                    <h3>Category Cards</h3>
+                    <p id="totalCategoryCards">0</p>
+                </div>
+
+                <div class="card">
+                    <h3>Custom Orders</h3>
+                    <p id="totalCustomDesigns">0</p>
+                </div>
+
+                <div class="card">
+                    <h3>Orders</h3>
+                    <p id="totalOrders">0</p>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ================= PRODUCTS ================= -->
+        <section id="products" class="panel">
+
+            <h1>Products</h1>
+
+            <!-- ADD PRODUCT -->
+            <div class="form">
+
+                <input type="text" id="name" placeholder="Product Name">
+                <input type="number" id="price" placeholder="Price">
+
+                <!-- MULTI IMAGE -->
+                <input type="file" id="images" multiple>
+
+                <select id="gender">
+                    <option value="men">Men</option>
+                    <option value="women">Women</option>
+                    <option value="unisex">Unisex</option>
+                </select>
+
+                <select id="type">
+                    <option value="tshirt">T-Shirt</option>
+                    <option value="top">Top</option>
+                    <option value="shirt">Shirt</option>
+                    <option value="short">Short</option>
+                    <option value="sweatpant">Sweatpants</option>
+                </select>
+
+                <select id="fit">
+                    <option value="">Not required (non T-Shirt)</option>
+                    <option value="oversized">Oversized</option>
+                    <option value="regular">Regular</option>
+                </select>
+
+                <div class="toggles">
+                    <label><input type="checkbox" id="featured"> Featured</label>
+                    <label><input type="checkbox" id="newCollection"> New Collection</label>
+                </div>
+
+                <button onclick="addProduct()">Add Product</button>
+
+            </div>
+
+            <!-- PRODUCT LIST -->
+            <div id="productList" class="list"></div>
+
+        </section>
+
+        <!-- ================= BANNERS ================= -->
+        <section id="banners" class="panel">
+
+            <h1>Banners</h1>
+
+            <div class="form">
+
+                <select id="bannerType">
+                    <option value="">Choose banner location</option>
+
+                    <option value="homeHero1">Home Hero 1</option>
+                    <option value="homeHero2">Home Hero 2</option>
+                    <option value="homeHero3">Home Hero 3</option>
+
+                    <option value="homeCollection">Home Collection Banner</option>
+
+                    <option value="homeMenSection">Home Men Section</option>
+                    <option value="homeWomenSection">Home Women Section</option>
+                    <option value="homeUnisexSection">Home Unisex Section</option>
+                    <option value="homeCustomDesign">Home Custom Design Banner</option>
+
+                    <option value="menHero">Men Page Hero</option>
+                    <option value="womenHero">Women Page Hero</option>
+                    <option value="unisexHero">Unisex Page Hero</option>
+
+                </select>
+
+                <input type="file" id="bannerImage" accept="image/*">
+                <button id="bannerSaveBtn" onclick="updateBanner()">Save Banner</button>
+
+            </div>
+            <p id="bannerEditorHint" class="banner-editor-hint hidden"></p>
+
+            <h2>Current Banners</h2>
+            <div id="bannerList" class="banner-grid"></div>
+
+        </section>
+
+        <!-- ================= CATEGORY CARDS ================= -->
+        <section id="categorycards" class="panel">
+
+            <h1>Category Cards</h1>
+
+            <div class="form category-card-form">
+                <select id="categoryCardGender">
+                    <option value="men">Men</option>
+                    <option value="women">Women</option>
+                    <option value="unisex">Unisex</option>
+                </select>
+
+                <select id="categoryCardId"></select>
+
+                <input type="text" id="categoryCardTitle" placeholder="Card Title (optional, overrides default)">
+                <input type="text" id="categoryCardSubtitle" placeholder="Card Subtitle (optional)">
+                <input type="file" id="categoryCardImage" accept="image/*">
+
+                <button id="categoryCardSaveBtn" type="button" onclick="saveCategoryCard()">Save Category Card</button>
+            </div>
+
+            <p id="categoryCardEditorHint" class="banner-editor-hint hidden"></p>
+            <p class="category-card-drag-note">
+                Drag and drop cards inside each gender group below to reorder storefront display.
+            </p>
+
+            <h2>Current Category Cards</h2>
+            <div id="categoryCardList" class="category-card-admin-grid"></div>
+        </section>
+
+        <!-- ================= CUSTOM DESIGN REQUESTS ================= -->
+        <section id="customdesigns" class="panel">
+            <h1>Custom Design Requests</h1>
+
+            <div class="custom-design-toolbar">
+                <select id="customDesignStatusFilter" onchange="loadCustomDesignRequests()">
+                    <option value="">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="in-review">In Review</option>
+                    <option value="quoted">Quoted</option>
+                    <option value="in-production">In Production</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+
+                <button type="button" onclick="loadCustomDesignRequests()">Refresh Requests</button>
+            </div>
+
+            <div id="customDesignList" class="custom-design-list"></div>
+        </section>
+
+        <!-- ================= ORDERS ================= -->
+        <section id="orders" class="panel">
+            <div class="orders-panel-head">
+                <div>
+                    <h1>Orders</h1>
+                    <p>Track every purchase with customer details, line items, and fulfillment status.</p>
+                </div>
+
+                <div class="orders-panel-actions">
+                    <button type="button" class="orders-action-btn" onclick="loadOrders()">Refresh</button>
+                    <button type="button" class="orders-action-btn dark" onclick="exportOrdersCsv()">Export CSV</button>
+                </div>
+            </div>
+
+            <div id="ordersStats" class="orders-stats-grid"></div>
+
+            <div class="orders-toolbar">
+                <input id="orderSearchInput" type="text" placeholder="Search by order code, name, email, phone" oninput="handleOrderFiltersChanged()">
+
+                <select id="orderStatusFilter" onchange="handleOrderFiltersChanged()">
+                    <option value="all">All Statuses</option>
+                    <option value="placed">Placed</option>
+                    <option value="processing">Processing</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+
+                <select id="orderSourceFilter" onchange="handleOrderFiltersChanged()">
+                    <option value="all">All Sources</option>
+                    <option value="web-cart">Web Cart</option>
+                    <option value="web-checkout">Web Checkout</option>
+                </select>
+
+                <select id="orderSortSelect" onchange="handleOrderFiltersChanged()">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="total_desc">Highest Value</option>
+                    <option value="total_asc">Lowest Value</option>
+                </select>
+            </div>
+
+            <div id="ordersFeedback" class="orders-feedback"></div>
+            <div id="ordersList" class="orders-list"></div>
+        </section>
+
+        <!-- ================= USERS ================= -->
+        <section id="users" class="panel">
+            <div class="users-panel-head">
+                <div>
+                    <h1>Users</h1>
+                    <p>Search, segment, and manage your customer accounts from one clean view.</p>
+                </div>
+                <div class="users-panel-actions">
+                    <button type="button" class="users-action-btn" onclick="loadUsers()">Refresh</button>
+                    <button type="button" class="users-action-btn dark" onclick="exportUsersCsv()">Export CSV</button>
+                </div>
+            </div>
+
+            <div id="usersStats" class="users-stats-grid"></div>
+
+            <div class="users-toolbar">
+                <input id="userSearchInput" type="text" placeholder="Search by name or email" oninput="handleUserFiltersChanged()">
+
+                <select id="userProviderFilter" onchange="handleUserFiltersChanged()">
+                    <option value="all">All Providers</option>
+                    <option value="google">Google</option>
+                    <option value="email">Email / Password</option>
+                </select>
+
+                <select id="userSortSelect" onchange="handleUserFiltersChanged()">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="name_asc">Name A-Z</option>
+                    <option value="email_asc">Email A-Z</option>
+                </select>
+            </div>
+
+            <div id="usersFeedback" class="users-feedback"></div>
+            <div id="userList" class="user-grid"></div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<!-- ================= PRODUCT EDIT POPUP ================= -->
+
+<div id="productPopup" class="popup hidden">
+
+    <div class="popup-box">
+        <div class="popup-topbar">
+            <h2>Edit Product</h2>
+            <div class="popup-topbar-actions">
+                <button type="button" class="popup-top-save-btn" onclick="saveEdit()">&#10003; Save</button>
+                <button type="button" class="popup-top-close-btn" onclick="closePopup()" aria-label="Close edit popup">&times;</button>
+            </div>
+        </div>
+
+        <!-- BASIC INFO -->
+        <div class="popup-section">
+            <h3>Basic Info</h3>
+
+            <input id="editName" placeholder="Product Name">
+            <input id="editSubtitle" placeholder="Subtitle (e.g. Cotton Linen Shirts)">
+            <input id="editPrice" type="number" placeholder="Price">
+            <select id="editGender">
+                <option value="men">Men</option>
+                <option value="women">Women</option>
+                <option value="unisex">Unisex</option>
+            </select>
+            <select id="editType">
+                <option value="tshirt">T-Shirt</option>
+                <option value="top">Top</option>
+                <option value="shirt">Shirt</option>
+                <option value="short">Short</option>
+                <option value="sweatpant">Sweatpants</option>
+            </select>
+            <select id="editFit">
+                <option value="">Not required (non T-Shirt)</option>
+                <option value="oversized">Oversized</option>
+                <option value="regular">Regular</option>
+            </select>
+
+            <div class="popup-flag-row">
+                <label class="popup-flag-toggle">
+                    <input type="checkbox" id="editFeatured">
+                    <span>Featured Section</span>
+                </label>
+
+                <label class="popup-flag-toggle">
+                    <input type="checkbox" id="editNewCollection">
+                    <span>New Collection Section</span>
+                </label>
+            </div>
+
+        </div>
+
+        <!-- IMAGES -->
+        <div class="popup-section">
+            <h3>Images</h3>
+
+            <div id="popupImages" class="popup-images"></div>
+            <input type="file" id="newImages" multiple>
+        </div>
+
+        <!-- PRODUCT DETAILS -->
+        <div class="popup-section">
+            <h3>Product Details</h3>
+
+            <input id="editMaterial" placeholder="Material (e.g. 85% Cotton 15% Linen)">
+            <input id="editCare" placeholder="Care (e.g. Machine Wash)">
+        </div>
+
+        <!-- MANUFACTURING -->
+        <div class="popup-section">
+            <h3>Manufacturing Info</h3>
+
+            <input id="editManufacturedBy" placeholder="Manufactured & Sold By">
+            <textarea id="editAddress" placeholder="Full Address"></textarea>
+            <input id="editCustomerCare" placeholder="Customer Care Contact">
+            <input id="editCountry" placeholder="Country of Origin (default India)">
+        </div>
+
+        <!-- DESCRIPTION -->
+        <div class="popup-section">
+            <h3>Description</h3>
+
+            <textarea id="editDescription" placeholder="Product Description"></textarea>
+            <textarea id="editArtist" placeholder="Artist Details"></textarea>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="popup-actions">
+            <button onclick="saveEdit()" class="save-btn">Save Changes</button>
+            <button onclick="deleteProduct()" class="delete-btn">Delete Product</button>
+            <button onclick="closePopup()" class="cancel-btn">Cancel</button>
+        </div>
+
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
+<script src="admin.js"></script>
+
+</body>
+</html>
+
+

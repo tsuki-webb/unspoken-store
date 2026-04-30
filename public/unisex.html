@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unisex Collection</title>
+<link rel="stylesheet" href="brand.css">
+<link rel="stylesheet" href="collection.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="collection-page" data-collection="unisex">
+
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<header class="collection-nav">
+    <a class="logo" href="index.html" aria-label="Home">
+        <img class="brand-logo" src="assets/logo/unspoken-store-logo.svg" alt="Store logo">
+    </a>
+    <nav class="collection-nav-links" aria-label="Collection navigation">
+        <a href="index.html">HOME</a>
+        <a href="men.html" data-nav="men">MEN</a>
+        <a href="women.html" data-nav="women">WOMEN</a>
+        <a href="unisex.html" data-nav="unisex">UNISEX</a>
+    </nav>
+    <a class="collection-cart-link" href="cart.html" aria-label="Open cart">
+        <span aria-hidden="true">&#128722;</span>
+        <span class="cart-count-badge hidden" data-cart-count>0</span>
+    </a>
+</header>
+
+<main class="collection-main">
+    <section class="collection-hero" id="collectionHero">
+        <img id="collectionHeroImage" src="" alt="Unisex collection hero">
+        <div class="hero-content">
+            <p class="hero-eyebrow" id="heroEyebrow"></p>
+            <h1 id="heroTitle"></h1>
+            <p id="heroSubtitle"></p>
+            <div class="hero-actions">
+                <a class="hero-btn primary" href="index.html#featuredProducts">Explore New Collection</a>
+                <a class="hero-btn" href="custom-design.html">Build Your Tee</a>
+            </div>
+            <ul class="hero-stats" id="heroStats"></ul>
+        </div>
+    </section>
+
+    <section class="category-strip-wrap">
+        <div class="category-strip-head">
+            <h2>Shop by Categories</h2>
+        </div>
+        <div class="category-strip" id="categoryStrip"></div>
+    </section>
+
+    <section class="category-cards-wrap" aria-label="Category cards">
+        <div class="category-cards-head">
+            <h2>Categories</h2>
+            <p>Choose a category, then refine T-Shirts by fit inside the section.</p>
+        </div>
+        <div class="category-cards-grid" id="categoryCardsGrid"></div>
+    </section>
+
+    <section class="content-rail hidden" id="recentlyViewedRail">
+        <div class="rail-head">
+            <div>
+                <h3>Recently Viewed</h3>
+                <p>Continue where you left off</p>
+            </div>
+        </div>
+        <div class="rail-row" id="recentlyViewedRow"></div>
+    </section>
+
+    <section class="content-rail hidden" id="newCollectionRail">
+        <div class="rail-head">
+            <div>
+                <h3>From New Collection</h3>
+                <p>Latest picks linked from your admin curation</p>
+            </div>
+            <a class="rail-action-btn" href="index.html#featuredProducts">See All</a>
+        </div>
+        <div class="rail-row" id="newCollectionRow"></div>
+    </section>
+
+    <section class="sections-host" id="collectionSections"></section>
+
+    <section class="empty-state hidden" id="collectionEmpty">
+        <h3>No Results Found</h3>
+        <p>Try a different search or filter combination.</p>
+        <div class="state-actions">
+            <button type="button" id="emptyResetBtn">Clear All Filters</button>
+        </div>
+    </section>
+
+    <section class="error-state hidden" id="collectionError">
+        <h3>Collection Unavailable</h3>
+        <p data-error-message>Unable to load this collection right now.</p>
+        <div class="state-actions">
+            <button type="button" id="collectionRetryBtn">Retry</button>
+        </div>
+    </section>
+
+    <footer class="collection-footer">
+        <strong class="brand-footer-mark"><img class="brand-logo" src="assets/logo/unspoken-store-logo.svg" alt="Store logo"></strong>
+        <span>Premium streetwear with curated drops and modular edits.</span>
+    </footer>
+</main>
+
+<section class="quick-view-modal" id="quickViewModal">
+    <div class="modal-overlay" id="quickViewOverlay"></div>
+    <div class="modal-panel">
+        <div class="modal-head">
+            <h3>Quick View</h3>
+            <button type="button" class="modal-close" id="quickViewCloseBtn" aria-label="Close quick view">&times;</button>
+        </div>
+        <div id="quickViewBody"></div>
+    </div>
+</section>
+
+<section class="compare-modal" id="compareModal">
+    <div class="modal-overlay" id="compareOverlay"></div>
+    <div class="modal-panel">
+        <div class="modal-head">
+            <h3>Compare Products</h3>
+            <button type="button" class="modal-close" id="compareCloseBtn" aria-label="Close compare">&times;</button>
+        </div>
+        <div id="compareBody"></div>
+    </div>
+</section>
+
+<section class="compare-bar" id="compareBar">
+    <div class="compare-items" id="compareItems"></div>
+    <div class="compare-actions">
+        <button type="button" id="clearCompareBtn">Clear</button>
+        <button type="button" class="primary" id="openCompareBtn">Compare</button>
+    </div>
+</section>
+
+<button type="button" class="back-to-top" id="backToTopBtn" aria-label="Back to top">&#8593;</button>
+<div class="toast-host" id="toastHost"></div>
+
+<script src="cart-core.js"></script>
+<script src="collection-core.js"></script>
+<script src="unisex.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Admin | User Orders</title>
+
+<link rel="stylesheet" href="brand.css">
+<link rel="stylesheet" href="admin.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="admin-orders-page">
+
+<main class="admin-user-orders-shell">
+    <div class="admin-user-orders-topbar">
+        <img class="brand-logo" src="assets/logo/unspoken-store-logo.svg" alt="Store logo">
+        <a class="admin-user-orders-back" href="admin.html#users">Back to Users</a>
+        <a class="admin-user-orders-back" href="admin.html#orders">All Orders</a>
+    </div>
+
+    <section class="admin-user-orders-card">
+        <header class="admin-user-orders-head">
+            <h1 id="userOrdersTitle">User Orders</h1>
+            <p id="userOrdersSubtitle">Loading user details...</p>
+        </header>
+
+        <div class="orders-panel-actions" style="margin: 14px 0 12px;">
+            <button type="button" class="orders-action-btn" onclick="loadUserOrders()">Refresh</button>
+            <button type="button" class="orders-action-btn dark" onclick="exportUserOrdersCsv()">Export CSV</button>
+        </div>
+
+        <div id="userOrdersStats" class="orders-stats-grid"></div>
+
+        <div class="orders-toolbar">
+            <input id="userOrderSearchInput" type="text" placeholder="Search by order code or item name" oninput="handleUserOrderFiltersChanged()">
+
+            <select id="userOrderStatusFilter" onchange="handleUserOrderFiltersChanged()">
+                <option value="all">All Statuses</option>
+                <option value="placed">Placed</option>
+                <option value="processing">Processing</option>
+                <option value="shipped">Shipped</option>
+                <option value="delivered">Delivered</option>
+                <option value="cancelled">Cancelled</option>
+            </select>
+
+            <select id="userOrderSourceFilter" onchange="handleUserOrderFiltersChanged()">
+                <option value="all">All Sources</option>
+                <option value="web-cart">Web Cart</option>
+                <option value="web-checkout">Web Checkout</option>
+            </select>
+
+            <select id="userOrderSortSelect" onchange="handleUserOrderFiltersChanged()">
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+                <option value="total_desc">Highest Value</option>
+                <option value="total_asc">Lowest Value</option>
+            </select>
+        </div>
+
+        <div id="userOrdersFeedback" class="orders-feedback"></div>
+        <div id="userOrdersList" class="orders-list"></div>
+    </section>
+</main>
+
+<script src="admin-user-orders.js"></script>
+</body>
+</html>

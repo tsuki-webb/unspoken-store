@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product</title>
+
+<link rel="stylesheet" href="brand.css">
+<link rel="stylesheet" href="product.css">
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <button class="back-btn" onclick="history.back()">&larr;</button>
+
+    <div class="logo product-brand" aria-label="Store">
+        <img class="brand-logo" src="assets/logo/unspoken-store-logo.svg" alt="Store logo">
+    </div>
+
+    <div class="nav-right">
+        <a class="product-cart-link" href="cart.html" aria-label="Open cart">
+            <span aria-hidden="true">&#128722;</span>
+            <span class="cart-count-badge hidden" data-cart-count>0</span>
+        </a>
+    </div>
+
+</header>
+
+<div class="product-page">
+
+    <div class="product-images">
+
+        <div class="thumbnail-list" id="thumbnailList"></div>
+
+        <div class="main-image">
+            <img id="mainImage" alt="Product image">
+        </div>
+
+    </div>
+
+    <div class="product-info">
+
+        <h1 id="productName"></h1>
+        <p class="subtitle" id="productSubtitle"></p>
+        <div class="product-meta" id="productMeta"></div>
+
+        <p class="price" id="productPrice"></p>
+        <p class="tax">Price incl. of all taxes</p>
+
+        <div class="sizes">
+            <p>Select size</p>
+            <div class="size-buttons">
+                <button>XS</button>
+                <button>S</button>
+                <button>M</button>
+                <button>L</button>
+                <button>XL</button>
+            </div>
+        </div>
+
+        <div class="quantity">
+            <label>Quantity</label>
+            <select id="quantitySelect">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+            </select>
+        </div>
+
+        <button class="add-cart" id="addCartBtn">ADD TO CART</button>
+        <button class="wishlist" id="buyNowBtn">BUY NOW</button>
+
+        <div class="delivery">
+            <h3>Delivery Details</h3>
+            <div class="delivery-box">
+                <input placeholder="Enter Pincode">
+                <button>CHECK</button>
+            </div>
+        </div>
+
+        <div class="accordion">
+
+            <div class="acc-item">
+                <div class="acc-title">Product Details</div>
+                <div class="acc-content" id="detailsContent"></div>
+            </div>
+
+            <div class="acc-item">
+                <div class="acc-title">Description</div>
+                <div class="acc-content" id="descContent"></div>
+            </div>
+
+            <div class="acc-item">
+                <div class="acc-title">Artist</div>
+                <div class="acc-content" id="artistContent"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<section class="related-section">
+    <div class="related-header">
+        <h2>Style Pairings</h2>
+        <p>Handpicked recommendations based on this product</p>
+    </div>
+
+    <div class="related-sections" id="relatedSections"></div>
+</section>
+
+<section class="reviews-section">
+    <h2>Customer Reviews</h2>
+
+    <div class="review">
+        <p class="stars">★★★★★</p>
+        <p>Insane quality, premium finish, and a perfect fit.</p>
+    </div>
+
+    <div class="review">
+        <p class="stars">★★★★☆</p>
+        <p>Great material and quick delivery. Worth it.</p>
+    </div>
+</section>
+
+<div class="product-toast" id="productToast"></div>
+
+<script src="cart-core.js"></script>
+<script src="product.js"></script>
+</body>
+</html>
