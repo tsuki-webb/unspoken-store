@@ -5,19 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Product</title>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="brand.css">
+<link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="product.css">
 </head>
 
 <body>
 
+<a class="skip-link" href="#mainContent">Skip to content</a>
 <header class="navbar">
 
-    <button class="back-btn" onclick="history.back()">&larr;</button>
+    <button class="back-btn" type="button" onclick="history.back()" aria-label="Go back">&larr;</button>
 
-    <div class="logo product-brand" aria-label="Store">
+    <a class="logo product-brand" href="index.html" aria-label="Store home">
         <img class="brand-logo" src="assets/logo/unspoken-store-logo.svg" alt="Store logo">
-    </div>
+    </a>
 
     <div class="nav-right">
         <a class="product-cart-link" href="cart.html" aria-label="Open cart">
@@ -28,6 +33,7 @@
 
 </header>
 
+<main class="product-main" id="mainContent">
 <div class="product-page">
 
     <div class="product-images">
@@ -43,15 +49,14 @@
     <div class="product-info">
 
         <h1 id="productName"></h1>
-        <p class="subtitle" id="productSubtitle"></p>
         <div class="product-meta" id="productMeta"></div>
 
         <p class="price" id="productPrice"></p>
         <p class="tax">Price incl. of all taxes</p>
 
         <div class="sizes">
-            <p>Select size</p>
-            <div class="size-buttons">
+            <p id="sizeLabel">Select size</p>
+            <div class="size-buttons" aria-labelledby="sizeLabel">
                 <button>XS</button>
                 <button>S</button>
                 <button>M</button>
@@ -61,7 +66,7 @@
         </div>
 
         <div class="quantity">
-            <label>Quantity</label>
+            <label for="quantitySelect">Quantity</label>
             <select id="quantitySelect">
                 <option>1</option>
                 <option>2</option>
@@ -71,31 +76,33 @@
             </select>
         </div>
 
-        <button class="add-cart" id="addCartBtn">ADD TO CART</button>
-        <button class="wishlist" id="buyNowBtn">BUY NOW</button>
+        <div class="purchase-actions">
+            <button class="add-cart" id="addCartBtn" type="button">ADD TO CART</button>
+            <button class="wishlist" id="buyNowBtn" type="button">BUY NOW</button>
+        </div>
 
         <div class="delivery">
             <h3>Delivery Details</h3>
             <div class="delivery-box">
-                <input placeholder="Enter Pincode">
-                <button>CHECK</button>
+                <input id="deliveryPincode" placeholder="Enter pincode" inputmode="numeric" autocomplete="postal-code">
+                <button type="button">CHECK</button>
             </div>
         </div>
 
         <div class="accordion">
 
             <div class="acc-item">
-                <div class="acc-title">Product Details</div>
+                <button class="acc-title" type="button" aria-expanded="true" aria-controls="detailsContent">Product Details</button>
                 <div class="acc-content" id="detailsContent"></div>
             </div>
 
             <div class="acc-item">
-                <div class="acc-title">Description</div>
+                <button class="acc-title" type="button" aria-expanded="false" aria-controls="descContent">Description</button>
                 <div class="acc-content" id="descContent"></div>
             </div>
 
             <div class="acc-item">
-                <div class="acc-title">Artist</div>
+                <button class="acc-title" type="button" aria-expanded="false" aria-controls="artistContent">Artist</button>
                 <div class="acc-content" id="artistContent"></div>
             </div>
 
@@ -128,7 +135,9 @@
     </div>
 </section>
 
-<div class="product-toast" id="productToast"></div>
+</main>
+
+<div class="product-toast" id="productToast" aria-live="polite" aria-atomic="true"></div>
 
 <script src="cart-core.js"></script>
 <script src="product.js"></script>

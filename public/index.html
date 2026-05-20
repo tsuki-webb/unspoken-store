@@ -3,20 +3,17 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-<title>Premium Streetwear</title>
-
+<title>Unspoken Store | Premium Streetwear</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="brand.css">
+<link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="index.css">
 </head>
+<body class="home-page">
 
-<body>
-
-<!-- ================= NAVBAR ================= -->
+<a class="skip-link" href="#mainContent">Skip to content</a>
 
 <header class="navbar">
-
     <button
         class="hamburger"
         id="menuToggleBtn"
@@ -36,8 +33,9 @@
     </a>
 
     <div class="home-search" id="homeSearchBox">
-        <input id="homeSearchInput" type="text" placeholder="Search products...">
-        <div class="home-search-results" id="homeSearchResults"></div>
+        <label class="sr-only" for="homeSearchInput">Search products</label>
+        <input id="homeSearchInput" type="text" placeholder="Search products..." autocomplete="off" aria-label="Search products">
+        <div class="home-search-results" id="homeSearchResults" aria-live="polite" aria-atomic="true"></div>
     </div>
 
     <div class="nav-links">
@@ -48,12 +46,21 @@
     </div>
 
     <div class="nav-icons">
-
         <div class="account-area">
-            <button class="signin-btn" id="signinBtn" onclick="openAuth()">Sign In</button>
+            <button class="signin-btn" id="signinBtn" type="button" onclick="openAuth()">Sign In</button>
 
             <div class="profile-wrapper" id="profileWrapper">
-                <button class="profile-circle" type="button" onclick="toggleProfileMenu()" aria-label="Open account menu">T</button>
+                <button
+                    class="profile-circle"
+                    type="button"
+                    onclick="toggleProfileMenu()"
+                    aria-label="Open account menu"
+                    aria-haspopup="menu"
+                    aria-controls="profileMenu"
+                    aria-expanded="false"
+                >
+                    T
+                </button>
 
                 <div class="profile-menu" id="profileMenu" role="menu">
                     <div class="profile-menu-head">
@@ -69,21 +76,16 @@
             </div>
         </div>
 
-        <span class="nav-icon" title="Wishlist">&#9825;</span>
+        <button class="nav-icon" type="button" title="Wishlist coming soon" aria-label="Wishlist coming soon">&#9825;</button>
         <a class="nav-icon cart-link-icon" href="cart.html" title="Cart" aria-label="Open cart">
             &#128722;
             <span class="cart-count-badge hidden" data-cart-count>0</span>
         </a>
-
     </div>
-
 </header>
-
-<!-- ================= HAMBURGER SIDE MENU ================= -->
 
 <aside class="full-menu" id="sideMenu" aria-hidden="true">
     <div class="menu-shell">
-
         <div class="menu-top">
             <span class="menu-logo" aria-label="Store">
                 <img class="brand-logo" src="assets/logo/unspoken-store-logo.svg" alt="Store logo">
@@ -100,16 +102,15 @@
         <div class="menu-search">
             <label class="menu-search-label" for="menuSearchInput">Search Products</label>
             <div class="menu-search-input-wrap">
-                <input id="menuSearchInput" type="text" placeholder="Search products">
+                <input id="menuSearchInput" type="text" placeholder="Search products" autocomplete="off" aria-label="Search products from the menu">
                 <button id="menuSearchBtn" class="menu-search-btn" type="button">Search</button>
             </div>
-            <div class="menu-search-results" id="menuSearchResults">
+            <div class="menu-search-results" id="menuSearchResults" aria-live="polite" aria-atomic="true">
                 <p class="menu-search-hint">Type at least 2 letters to search.</p>
             </div>
         </div>
 
         <div class="menu-scroll">
-
             <section class="menu-content active" id="men">
                 <div class="menu-link-block">
                     <h4>Shop by Categories</h4>
@@ -168,476 +169,438 @@
 
 <div class="overlay" id="overlay" onclick="toggleMenu(false)"></div>
 
-<!-- ================= HERO ================= -->
-
-<section class="hero">
-    <div class="slider">
-
-        <div class="slide active">
-            <img id="hero1" alt="Banner 1">
-            <div class="slide-content">
-                <h1>DARE THE STREET</h1>
-                <p>Premium oversized essentials</p>
-                <div class="hero-buttons">
-                    <a href="men.html">Shop Men</a>
-                    <a href="women.html">Shop Women</a>
+<main id="mainContent">
+    <section class="hero">
+        <div class="slider">
+            <div class="slide active">
+                <img id="hero1" alt="Banner 1">
+                <div class="slide-content">
+                    <span class="hero-kicker">PREMIUM STREETWEAR</span>
+                    <h1>DARE THE STREET</h1>
+                    <p>Premium oversized essentials with cleaner silhouettes, stronger details, and a more confident fit.</p>
+                    <div class="hero-buttons">
+                        <a href="men.html">Shop Men</a>
+                        <a href="women.html">Shop Women</a>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="slide">
-            <img id="hero2" alt="Banner 2">
-            <div class="slide-content">
-                <h1>NEW SEASON DROP</h1>
-                <p>Sharp silhouettes with modern movement</p>
-                <div class="hero-buttons">
-                    <a href="men.html">Explore Men</a>
-                    <a href="unisex.html">Explore Unisex</a>
+            <div class="slide">
+                <img id="hero2" alt="Banner 2">
+                <div class="slide-content">
+                    <span class="hero-kicker">NEW SEASON DROP</span>
+                    <h1>NEW SEASON DROP</h1>
+                    <p>Sharp silhouettes with modern movement, curated category pages, and faster mobile browsing.</p>
+                    <div class="hero-buttons">
+                        <a href="men.html">Explore Men</a>
+                        <a href="unisex.html">Explore Unisex</a>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="slide">
-            <img id="hero3" alt="Banner 3">
-            <div class="slide-content">
-                <h1>CURATED FOR HER</h1>
-                <p>Streetwear essentials with a refined edge</p>
-                <div class="hero-buttons">
-                    <a href="women.html">Shop Women</a>
-                    <a href="index.html#featuredProducts">New Collection</a>
+            <div class="slide">
+                <img id="hero3" alt="Banner 3">
+                <div class="slide-content">
+                    <span class="hero-kicker">CURATED FOR HER</span>
+                    <h1>CURATED FOR HER</h1>
+                    <p>Refined streetwear essentials designed to feel polished, expressive, and effortless on every device.</p>
+                    <div class="hero-buttons">
+                        <a href="women.html">Shop Women</a>
+                        <a href="index.html#featuredProducts">New Collection</a>
+                    </div>
                 </div>
             </div>
+
+            <button class="arrow left" type="button" onclick="prevSlide()" aria-label="Previous slide">&#10094;</button>
+            <button class="arrow right" type="button" onclick="nextSlide()" aria-label="Next slide">&#10095;</button>
+
+            <div class="dots">
+                <span class="dot active" onclick="goToSlide(0)"></span>
+                <span class="dot" onclick="goToSlide(1)"></span>
+                <span class="dot" onclick="goToSlide(2)"></span>
+            </div>
+        </div>
+    </section>
+
+    <section class="trust-bar">
+        <div class="trust-item">
+            <span class="icon">&#10024;</span>
+            <p><strong>Free gifts</strong><br>with all orders</p>
         </div>
 
-        <button class="arrow left" onclick="prevSlide()">‹</button>
-        <button class="arrow right" onclick="nextSlide()">›</button>
-
-        <div class="dots">
-            <span class="dot active" onclick="goToSlide(0)"></span>
-            <span class="dot" onclick="goToSlide(1)"></span>
-            <span class="dot" onclick="goToSlide(2)"></span>
-        </div>
-    </div>
-</section>
-
-<!-- ================= TRUST BAR ================= -->
-
-<section class="trust-bar">
-
-    <div class="trust-item">
-        <span class="icon">🎁</span>
-        <p><strong>Free gifts</strong><br>with all orders</p>
-    </div>
-
-    <div class="trust-item">
-        <span class="icon">📦</span>
-        <p><strong>30 days Easy Returns</strong><br>& Exchanges</p>
-    </div>
-
-    <div class="trust-item">
-        <span class="icon">🚚</span>
-        <p><strong>Free & Fast Shipping</strong></p>
-    </div>
-
-</section>
-
-
-
-
-
-<!-- ================= NEW COLLECTION ================= -->
-
-<!-- ================= NEW COLLECTION BANNER ================= -->
-
-<section class="collection-banner">
-
-   <img id="collectionBanner" class="collection-bg">
-
-    <div class="collection-content">
-        <h2>NEW COLLECTION</h2>
-        <p>Free gifts with every order</p>
-    </div>
-
-    <!-- 🔥 TIMER BOX -->
-    <div class="offer-timer">
-        <p class="offer-text">Grab up to 60% OFF</p>
-
-        <div class="timer">
-            <span id="hours">24</span> :
-            <span id="minutes">00</span> :
-            <span id="seconds">00</span>
+        <div class="trust-item">
+            <span class="icon">&#8635;</span>
+            <p><strong>30 days easy returns</strong><br>&amp; exchanges</p>
         </div>
 
-        <small>Limited time deal</small>
-    </div>
+        <div class="trust-item">
+            <span class="icon">&#128666;</span>
+            <p><strong>Free &amp; fast shipping</strong><br>on qualifying orders</p>
+        </div>
+    </section>
 
-</section>
+    <!-- <section class="collection-banner">
+        <img id="collectionBanner" class="collection-bg" alt="New collection banner">
 
-<!-- ================= PRODUCTS ================= -->
-
-<section class="product-section">
-    <div class="featured-grid" id="featuredProducts"></div>
-</section>
-
-
-
-
-<!-- ================= CUSTOMER LOVE SECTION ================= -->
-
-<section class="customer-voices">
-    <div class="voices-bg-orb orb-1"></div>
-    <div class="voices-bg-orb orb-2"></div>
-
-    <div class="voices-header fade-up">
-        <span class="voices-kicker">COMMUNITY LOVE</span>
-        <h2>Look what our customers say</h2>
-        <p>
-            Real feedback from people who wear our pieces every day. Style, comfort,
-            fit, and confidence — straight from the community.
-        </p>
-    </div>
-
-    <div class="voices-wrap">
-
-        <!-- TOP ROW -->
-        <div class="voices-row top-row fade-up">
-
-            <article class="voice-card featured-card">
-                <div class="voice-top">
-                    <div class="voice-user">
-                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80" alt="Customer">
-                        <div>
-                            <h4>Rafi Ahmed</h4>
-                            <span>Dhaka</span>
-                        </div>
-                    </div>
-                    <div class="voice-stars">★★★★★</div>
-                </div>
-
-                <p class="voice-text">
-                    “The oversized tee quality genuinely shocked me. Heavy feel,
-                    clean print, and the fit sits exactly the way premium streetwear should.”
-                </p>
-
-                <div class="voice-tags">
-                    <span>Oversized Tee</span>
-                    <span>Premium Fit</span>
-                </div>
-            </article>
-
-            <article class="voice-card">
-                <div class="voice-top">
-                    <div class="voice-user">
-                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80" alt="Customer">
-                        <div>
-                            <h4>Trina Sultana</h4>
-                            <span>Chattogram</span>
-                        </div>
-                    </div>
-                    <div class="voice-stars">★★★★★</div>
-                </div>
-
-                <p class="voice-text">
-                    “Loved the women’s regular fit tee. Super flattering and the fabric
-                    feels way better than most local brands.”
-                </p>
-            </article>
-
-            <article class="voice-card">
-                <div class="voice-top">
-                    <div class="voice-user">
-                        <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&q=80" alt="Customer">
-                        <div>
-                            <h4>Farhan Karim</h4>
-                            <span>Sylhet</span>
-                        </div>
-                    </div>
-                    <div class="voice-stars">★★★★★</div>
-                </div>
-
-                <p class="voice-text">
-                    “The designs feel clean and expensive. Doesn’t look mass-produced,
-                    which is exactly what I wanted.”
-                </p>
-            </article>
-
-            <article class="voice-card tall-card">
-                <div class="voice-top">
-                    <div class="voice-user">
-                        <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80" alt="Customer">
-                        <div>
-                            <h4>Maisha Noor</h4>
-                            <span>Rajshahi</span>
-                        </div>
-                    </div>
-                    <div class="voice-stars">★★★★★</div>
-                </div>
-
-                <p class="voice-text">
-                    “Fast delivery, nice packaging, and the tops section is actually stylish.
-                    The whole experience felt premium.”
-                </p>
-
-                <div class="mini-proof">
-                    <span>Verified Purchase</span>
-                </div>
-            </article>
-
-            <article class="thoughts-card">
-                <div class="thoughts-inner">
-                    <span class="thoughts-kicker">YOUR TURN</span>
-                    <h3>Give us your thoughts</h3>
-                    <p>
-                        Tell us what you loved, what you styled, and what you want next.
-                        Your reviews shape the next drop.
-                    </p>
-                    <button class="thoughts-btn">Write a review</button>
-                </div>
-            </article>
-
+        <div class="collection-content">
+            <span class="section-kicker">NEW COLLECTION</span>
+            <h2>Built for premium everyday wear</h2>
+            <p>Fresh drops, cleaner browsing, and a sharper multi-device shopping flow.</p>
         </div>
 
-        <!-- BOTTOM ROW -->
-        <div class="voices-row bottom-row fade-up">
+        <div class="offer-timer">
+            <p class="offer-text">Grab up to 60% OFF</p>
+            <div class="timer" aria-live="polite" aria-atomic="true">
+                <span id="hours">24</span> :
+                <span id="minutes">00</span> :
+                <span id="seconds">00</span>
+            </div>
+            <small>Limited time deal</small>
+        </div>
+    </section> -->
 
-            <article class="voice-card compact-card">
-                <div class="voice-top">
-                    <div class="voice-user">
-                        <img src="https://images.unsplash.com/photo-1504593811423-6dd665756598?auto=format&fit=crop&w=200&q=80" alt="Customer">
-                        <div>
-                            <h4>Imran Hossain</h4>
-                            <span>Khulna</span>
-                        </div>
-                    </div>
-                    <div class="voice-stars">★★★★★</div>
-                </div>
-                <p class="voice-text">
-                    “Unisex fits are properly balanced. Not awkward at all.”
-                </p>
-            </article>
-
-            <article class="voice-card wide-card">
-                <div class="voice-top">
-                    <div class="voice-user">
-                        <img src="https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=200&q=80" alt="Customer">
-                        <div>
-                            <h4>Sadia Rahman</h4>
-                            <span>Dhaka</span>
-                        </div>
-                    </div>
-                    <div class="voice-stars">★★★★★</div>
-                </div>
-                <p class="voice-text">
-                    “Honestly didn’t expect the finishing to be this good. Stitching,
-                    neckline, print placement — everything felt well thought out.”
-                </p>
-            </article>
-
-            <article class="voice-card compact-card">
-                <div class="voice-top">
-                    <div class="voice-user">
-                        <img src="https://images.unsplash.com/photo-1502767089025-6572583495b0?auto=format&fit=crop&w=200&q=80" alt="Customer">
-                        <div>
-                            <h4>Tahmid</h4>
-                            <span>Barishal</span>
-                        </div>
-                    </div>
-                    <div class="voice-stars">★★★★★</div>
-                </div>
-                <p class="voice-text">
-                    “Packaging and delivery experience was clean.”
-                </p>
-            </article>
-
-            <article class="voice-card wide-card">
-                <div class="voice-top">
-                    <div class="voice-user">
-                        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80" alt="Customer">
-                        <div>
-                            <h4>Nusrat Jahan</h4>
-                            <span>Cumilla</span>
-                        </div>
-                    </div>
-                    <div class="voice-stars">★★★★★</div>
-                </div>
-                <p class="voice-text">
-                    “The site looks premium and the actual product matched the vibe.
-                    That almost never happens.”
-                </p>
-            </article>
-
+    <section class="product-section">
+        <div class="section-header">
+            <span class="section-kicker">EDITOR'S PICK</span>
+            <h2>New Collection</h2>
+            <p>Fresh product cards, quicker add-to-cart actions, and layouts tuned for phones, tablets, and wide screens.</p>
         </div>
 
-    </div>
-</section>
+        <div class="featured-grid" id="featuredProducts"></div>
+    </section>
 
+    <section class="customer-voices">
+        <div class="voices-bg-orb orb-1"></div>
+        <div class="voices-bg-orb orb-2"></div>
 
-
-
-
-
-
-
-<!-- ================= MEN BANNER ================= -->
-
-<section class="section-banner">
-    <img id="menBanner" alt="Men Banner">
-</section>
-
-<!-- ================= MEN ================= -->
-
-<section class="product-section alt">
-    <div class="section-header">
-        <h2>Men</h2>
-        <p>Clean silhouettes & modern fits</p>
-    </div>
-
-    <div class="product-row" id="menPreview"></div>
-
-    <div class="section-link">
-        <a href="men.html">Explore Men →</a>
-    </div>
-</section>
-
-
-
-
-
-
-<section class="custom-studio-section" id="customStudioSection">
-    <div class="custom-studio-shell">
-        <div class="custom-studio-copy">
-            <span class="custom-studio-kicker">CUSTOM STUDIO</span>
-            <h2>Create Your Own T-Shirt</h2>
+        <div class="voices-header fade-up">
+            <span class="voices-kicker">COMMUNITY LOVE</span>
+            <h2>Look what our customers say</h2>
             <p>
-                Turn your concept into a premium custom piece. Upload your artwork, pick oversized or regular fit,
-                choose print placement for front, back, or both sides, and send detailed production notes in one flow.
+                Real feedback from people who wear our pieces every day. Style, comfort,
+                fit, and confidence, straight from the community.
             </p>
+        </div>
 
-            <div class="custom-studio-points">
-                <span>Professional print placement setup</span>
-                <span>Front and back design support</span>
-                <span>Size-wise quantity management</span>
-                <span>Special instruction review before production</span>
+        <div class="voices-wrap">
+            <div class="voices-row top-row fade-up">
+                <article class="voice-card featured-card">
+                    <div class="voice-top">
+                        <div class="voice-user">
+                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80" alt="Customer">
+                            <div>
+                                <h4>Rafi Ahmed</h4>
+                                <span>Dhaka</span>
+                            </div>
+                        </div>
+                        <div class="voice-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                    </div>
+
+                    <p class="voice-text">
+                        &ldquo;The oversized tee quality genuinely shocked me. Heavy feel,
+                        clean print, and the fit sits exactly the way premium streetwear should.&rdquo;
+                    </p>
+
+                    <div class="voice-tags">
+                        <span>Oversized Tee</span>
+                        <span>Premium Fit</span>
+                    </div>
+                </article>
+
+                <article class="voice-card">
+                    <div class="voice-top">
+                        <div class="voice-user">
+                            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80" alt="Customer">
+                            <div>
+                                <h4>Trina Sultana</h4>
+                                <span>Chattogram</span>
+                            </div>
+                        </div>
+                        <div class="voice-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                    </div>
+
+                    <p class="voice-text">
+                        &ldquo;Loved the women&rsquo;s regular fit tee. Super flattering and the fabric
+                        feels way better than most local brands.&rdquo;
+                    </p>
+                </article>
+
+                <article class="voice-card">
+                    <div class="voice-top">
+                        <div class="voice-user">
+                            <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&q=80" alt="Customer">
+                            <div>
+                                <h4>Farhan Karim</h4>
+                                <span>Sylhet</span>
+                            </div>
+                        </div>
+                        <div class="voice-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                    </div>
+
+                    <p class="voice-text">
+                        &ldquo;The designs feel clean and expensive. Doesn&rsquo;t look mass-produced,
+                        which is exactly what I wanted.&rdquo;
+                    </p>
+                </article>
+
+                <article class="voice-card tall-card">
+                    <div class="voice-top">
+                        <div class="voice-user">
+                            <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80" alt="Customer">
+                            <div>
+                                <h4>Maisha Noor</h4>
+                                <span>Rajshahi</span>
+                            </div>
+                        </div>
+                        <div class="voice-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                    </div>
+
+                    <p class="voice-text">
+                        &ldquo;Fast delivery, nice packaging, and the tops section is actually stylish.
+                        The whole experience felt premium.&rdquo;
+                    </p>
+
+                    <div class="mini-proof">
+                        <span>Verified Purchase</span>
+                    </div>
+                </article>
+
+                <article class="thoughts-card">
+                    <div class="thoughts-inner">
+                        <span class="thoughts-kicker">NEED HELP?</span>
+                        <h3>Talk with our team</h3>
+                        <p>
+                            Have sizing questions, delivery concerns, or a custom brief in mind?
+                            Reach out and we will help you land the right fit.
+                        </p>
+                        <button class="thoughts-btn" type="button">Contact our team</button>
+                    </div>
+                </article>
             </div>
 
-            <div class="custom-studio-actions">
-                <a class="primary" href="custom-design.html">Start Custom Order</a>
-                <a class="ghost" href="custom-design.html#designWorkflow">View Workflow</a>
+            <div class="voices-row bottom-row fade-up">
+                <article class="voice-card compact-card">
+                    <div class="voice-top">
+                        <div class="voice-user">
+                            <img src="https://images.unsplash.com/photo-1504593811423-6dd665756598?auto=format&fit=crop&w=200&q=80" alt="Customer">
+                            <div>
+                                <h4>Imran Hossain</h4>
+                                <span>Khulna</span>
+                            </div>
+                        </div>
+                        <div class="voice-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                    </div>
+                    <p class="voice-text">
+                        &ldquo;Unisex fits are properly balanced. Not awkward at all.&rdquo;
+                    </p>
+                </article>
+
+                <article class="voice-card wide-card">
+                    <div class="voice-top">
+                        <div class="voice-user">
+                            <img src="https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=200&q=80" alt="Customer">
+                            <div>
+                                <h4>Sadia Rahman</h4>
+                                <span>Dhaka</span>
+                            </div>
+                        </div>
+                        <div class="voice-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                    </div>
+                    <p class="voice-text">
+                        &ldquo;Honestly didn&rsquo;t expect the finishing to be this good. Stitching,
+                        neckline, print placement, everything felt well thought out.&rdquo;
+                    </p>
+                </article>
+
+                <article class="voice-card compact-card">
+                    <div class="voice-top">
+                        <div class="voice-user">
+                            <img src="https://images.unsplash.com/photo-1502767089025-6572583495b0?auto=format&fit=crop&w=200&q=80" alt="Customer">
+                            <div>
+                                <h4>Tahmid</h4>
+                                <span>Barishal</span>
+                            </div>
+                        </div>
+                        <div class="voice-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                    </div>
+                    <p class="voice-text">
+                        &ldquo;Packaging and delivery experience was clean.&rdquo;
+                    </p>
+                </article>
+
+                <article class="voice-card wide-card">
+                    <div class="voice-top">
+                        <div class="voice-user">
+                            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80" alt="Customer">
+                            <div>
+                                <h4>Nusrat Jahan</h4>
+                                <span>Cumilla</span>
+                            </div>
+                        </div>
+                        <div class="voice-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                    </div>
+                    <p class="voice-text">
+                        &ldquo;The site looks premium and the actual product matched the vibe.
+                        That almost never happens.&rdquo;
+                    </p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-banner">
+        <img id="menBanner" alt="Men banner">
+    </section>
+
+    <section class="product-section alt">
+        <div class="section-header">
+            <span class="section-kicker">MEN</span>
+            <h2>Clean silhouettes &amp; modern fits</h2>
+            <p>Browse elevated essentials with the same refined product cards and mobile-friendly collection flow.</p>
+        </div>
+
+        <div class="product-row" id="menPreview"></div>
+
+        <div class="section-link">
+            <a href="men.html">Explore Men &rarr;</a>
+        </div>
+    </section>
+
+    <section class="custom-studio-section" id="customStudioSection">
+        <div class="custom-studio-shell">
+            <div class="custom-studio-copy">
+                <span class="custom-studio-kicker">CUSTOM STUDIO</span>
+                <h2>Create Your Own T-Shirt</h2>
+                <p>
+                    Turn your concept into a premium custom piece. Upload your artwork, pick oversized or regular fit,
+                    choose print placement for front, back, or both sides, and send detailed production notes in one flow.
+                </p>
+
+                <div class="custom-studio-points">
+                    <span>Professional print placement setup</span>
+                    <span>Front and back design support</span>
+                    <span>Size-wise quantity management</span>
+                    <span>Special instruction review before production</span>
+                </div>
+
+                <div class="custom-studio-actions">
+                    <a class="primary" href="custom-design.html">Start Custom Order</a>
+                    <a class="ghost" href="custom-design.html#designWorkflow">View Workflow</a>
+                </div>
+            </div>
+
+            <div class="custom-studio-media">
+                <img
+                    id="customDesignBanner"
+                    src="https://images.unsplash.com/photo-1485518882345-15568b007407?auto=format&fit=crop&w=1400&q=80"
+                    alt="Custom t-shirt design studio"
+                >
+                <div class="custom-studio-pill pill-a">Oversized / Regular</div>
+                <div class="custom-studio-pill pill-b">Front / Back / Both</div>
+                <div class="custom-studio-pill pill-c">Upload + Notes + Sizes</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-banner">
+        <img id="womenBanner" alt="Women banner">
+    </section>
+
+    <section class="product-section">
+        <div class="section-header">
+            <span class="section-kicker">WOMEN</span>
+            <h2>Refined streetwear essentials</h2>
+            <p>Sharper spacing, better tap targets, and presentation that stays premium from large monitors down to phones.</p>
+        </div>
+
+        <div class="product-row" id="womenPreview"></div>
+
+        <div class="section-link">
+            <a href="women.html">Explore Women &rarr;</a>
+        </div>
+    </section>
+
+    <section class="section-banner">
+        <img id="unisexBanner" alt="Unisex banner">
+    </section>
+
+    <section class="product-section alt">
+        <div class="section-header">
+            <span class="section-kicker">UNISEX</span>
+            <h2>Versatile pieces for every style</h2>
+            <p>Universal fits with cleaner browsing, faster filters, and a storefront that adapts smoothly to every screen size.</p>
+        </div>
+
+        <div class="product-row" id="unisexPreview"></div>
+
+        <div class="section-link">
+            <a href="unisex.html">Explore Unisex &rarr;</a>
+        </div>
+    </section>
+
+    <footer class="footer" id="footerContact">
+        <div class="footer-shell">
+            <div class="footer-brand-block">
+                <span class="footer-kicker">UNSPOKEN STORE</span>
+                <h3>Premium streetwear built to feel sharp on every screen and in every fit.</h3>
+                <p>Browse edited collections, discover new drops, and use the custom studio to build production-ready tees with a cleaner checkout experience.</p>
+            </div>
+
+            <div class="footer-links-group">
+                <h4>Shop</h4>
+                <a href="men.html">Men</a>
+                <a href="women.html">Women</a>
+                <a href="unisex.html">Unisex</a>
+                <a href="#featuredProducts">New Collection</a>
+            </div>
+
+            <div class="footer-links-group">
+                <h4>Services</h4>
+                <a href="custom-design.html">Custom Studio</a>
+                <a href="cart.html">Cart &amp; Checkout</a>
+                <a href="#customStudioSection">Build Your Tee</a>
+                <a href="#footerContact">Customer Care</a>
+            </div>
+
+            <div class="footer-links-group">
+                <h4>Why customers stay</h4>
+                <p>Responsive storefront flow</p>
+                <p>Fast cart actions</p>
+                <p>Premium product presentation</p>
+                <p>Mobile-first browsing experience</p>
             </div>
         </div>
 
-        <div class="custom-studio-media">
-            <img
-                id="customDesignBanner"
-                src="https://images.unsplash.com/photo-1485518882345-15568b007407?auto=format&fit=crop&w=1400&q=80"
-                alt="Custom t-shirt design studio"
-            >
-            <div class="custom-studio-pill pill-a">Oversized / Regular</div>
-            <div class="custom-studio-pill pill-b">Front / Back / Both</div>
-            <div class="custom-studio-pill pill-c">Upload + Notes + Sizes</div>
+        <div class="footer-bottom">
+            &copy; 2026 <img class="brand-logo brand-logo-inline" src="assets/logo/unspoken-store-logo.svg" alt="Store logo">. All rights reserved.
         </div>
-    </div>
-</section>
-
-
-
-
-
-
-
-
-
-<!-- ================= WOMEN BANNER ================= -->
-
-<section class="section-banner">
-    <img id="womenBanner" alt="Women Banner">
-</section>
-
-<!-- ================= WOMEN ================= -->
-
-<section class="product-section">
-    <div class="section-header">
-        <h2>Women</h2>
-        <p>Refined streetwear essentials</p>
-    </div>
-
-    <div class="product-row" id="womenPreview"></div>
-
-    <div class="section-link">
-        <a href="women.html">Explore Women →</a>
-    </div>
-</section>
-
-<!-- ================= UNISEX BANNER ================= -->
-
-<section class="section-banner">
-    <img id="unisexBanner" alt="Unisex Banner">
-</section>
-
-<!-- ================= UNISEX ================= -->
-
-<section class="product-section alt">
-    <div class="section-header">
-        <h2>Unisex</h2>
-        <p>Versatile pieces for every style</p>
-    </div>
-
-    <div class="product-row" id="unisexPreview"></div>
-
-    <div class="section-link">
-        <a href="unisex.html">Explore Unisex →</a>
-    </div>
-</section>
-
-<!-- ================= PROMO ================= -->
-<!-- 
-<section class="promo-banner">
-    <div class="promo-content">
-        <h2>Mid-Season Drop</h2>
-        <p>Limited pieces, premium quality</p>
-        <a href="men.html">Shop Now</a>
-    </div>
-</section> -->
-
-<!-- ================= FOOTER ================= -->
-
-<footer class="footer" id="footerContact">
-    <div class="footer-bottom">
-        © 2026 <img class="brand-logo brand-logo-inline" src="assets/logo/unspoken-store-logo.svg" alt="Store logo">. All rights reserved.
-    </div>
-</footer>
-
-<!-- ================= AUTH POPUP ================= -->
+    </footer>
+</main>
 
 <div class="auth-overlay" id="authOverlay">
+    <div class="auth-box" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+        <button class="auth-close" type="button" onclick="closeAuth()" aria-label="Close sign in dialog">&times;</button>
 
-    <div class="auth-box">
+        <h2 id="authTitle">Sign In</h2>
 
-        <button class="auth-close" onclick="closeAuth()">✕</button>
+        <input type="email" id="loginEmail" placeholder="Email" autocomplete="email" aria-label="Email address">
+        <input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password" aria-label="Password">
 
-        <h2>Sign In</h2>
-
-        <input type="email" id="loginEmail" placeholder="Email">
-        <input type="password" id="loginPassword" placeholder="Password">
-
-        <button onclick="login()">Login</button>
+        <button type="button" onclick="login()">Login</button>
 
         <p>Don't have an account?</p>
 
         <h3>Create Account</h3>
 
-        <input type="email" id="signupEmail" placeholder="Email">
-        <input type="password" id="signupPassword" placeholder="Password">
+        <input type="email" id="signupEmail" placeholder="Email" autocomplete="email" aria-label="Create account email">
+        <input type="password" id="signupPassword" placeholder="Password" autocomplete="new-password" aria-label="Create account password">
 
-        <button onclick="signup()">Create Account</button>
+        <button type="button" onclick="signup()">Create Account</button>
 
-        <button onclick="googleLogin()" class="google-btn">
+        <button type="button" onclick="googleLogin()" class="google-btn">
             Continue with Google
         </button>
-
     </div>
-
 </div>
 
 <script src="cart-core.js"></script>
@@ -775,8 +738,3 @@ window.googleLogin = async function () {
 
 </body>
 </html>
-
-
-
-
-

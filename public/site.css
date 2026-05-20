@@ -1,0 +1,158 @@
+:root {
+    --site-max-width: 1320px;
+    --site-content-width: min(var(--site-max-width), 94vw);
+    --site-radius-sm: 12px;
+    --site-radius-md: 18px;
+    --site-radius-lg: 28px;
+    --site-border: rgba(17, 17, 17, 0.1);
+    --site-surface: rgba(255, 255, 255, 0.9);
+    --site-surface-strong: #ffffff;
+    --site-shadow-sm: 0 10px 24px rgba(20, 18, 12, 0.08);
+    --site-shadow-md: 0 18px 40px rgba(20, 18, 12, 0.12);
+    --site-shadow-lg: 0 28px 56px rgba(20, 18, 12, 0.18);
+    --site-focus: #111111;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 88px;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    min-width: 320px;
+    overflow-x: hidden;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+}
+
+img,
+svg,
+video,
+canvas {
+    display: block;
+    max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+a,
+button,
+input,
+select,
+textarea {
+    -webkit-tap-highlight-color: transparent;
+}
+
+a,
+button,
+[role="button"] {
+    touch-action: manipulation;
+}
+
+:focus-visible {
+    outline: 3px solid var(--site-focus);
+    outline-offset: 3px;
+}
+
+::selection {
+    background: rgba(17, 17, 17, 0.16);
+    color: inherit;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.visually-hidden,
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+.skip-link {
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 20000;
+    min-height: 44px;
+    padding: 0 16px;
+    border-radius: 999px;
+    background: #111;
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--site-shadow-md);
+    transform: translateY(-170%);
+    transition: transform 0.2s ease;
+}
+
+.skip-link:focus-visible {
+    transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+html,
+body {
+    max-width: 100%;
+}
+
+html {
+    overflow-x: clip;
+}
+
+body {
+    overflow-x: clip;
+}
+
+@supports not (overflow: clip) {
+    html,
+    body {
+        overflow-x: hidden;
+    }
+}
+
+@media (max-width: 760px) {
+    html {
+        scroll-padding-top: 68px;
+    }
+
+    body {
+        min-width: 0;
+    }
+}

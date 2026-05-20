@@ -7,12 +7,14 @@
 <title>Admin Panel</title>
 
 <link rel="stylesheet" href="brand.css">
+<link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="admin.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
 <body>
 
+<a class="skip-link" href="#mainContent">Skip to content</a>
 <div class="admin-layout">
 
     <!-- SIDEBAR -->
@@ -35,7 +37,7 @@
     </aside>
 
     <!-- MAIN -->
-    <main class="main">
+    <main class="main" id="mainContent">
 
         <!-- ================= DASHBOARD ================= -->
         <section id="dashboard" class="panel active">
@@ -147,9 +149,17 @@
                     <option value="homeUnisexSection">Home Unisex Section</option>
                     <option value="homeCustomDesign">Home Custom Design Banner</option>
 
-                    <option value="menHero">Men Page Hero</option>
-                    <option value="womenHero">Women Page Hero</option>
-                    <option value="unisexHero">Unisex Page Hero</option>
+                    <option value="menHero">Men Page Hero 1</option>
+                    <option value="menHero2">Men Page Hero 2</option>
+                    <option value="menHero3">Men Page Hero 3</option>
+
+                    <option value="womenHero">Women Page Hero 1</option>
+                    <option value="womenHero2">Women Page Hero 2</option>
+                    <option value="womenHero3">Women Page Hero 3</option>
+
+                    <option value="unisexHero">Unisex Page Hero 1</option>
+                    <option value="unisexHero2">Unisex Page Hero 2</option>
+                    <option value="unisexHero3">Unisex Page Hero 3</option>
 
                 </select>
 
@@ -320,7 +330,6 @@
             <h3>Basic Info</h3>
 
             <input id="editName" placeholder="Product Name">
-            <input id="editSubtitle" placeholder="Subtitle (e.g. Cotton Linen Shirts)">
             <input id="editPrice" type="number" placeholder="Price">
             <select id="editGender">
                 <option value="men">Men</option>

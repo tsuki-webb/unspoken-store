@@ -5,12 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Category</title>
 <link rel="stylesheet" href="brand.css">
+<link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="collection.css">
 <link rel="stylesheet" href="category.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body class="collection-page category-page">
 
+<a class="skip-link" href="#mainContent">Skip to content</a>
 <div class="scroll-progress" id="scrollProgress"></div>
 
 <header class="collection-nav">
@@ -29,7 +31,7 @@
     </a>
 </header>
 
-<main class="collection-main category-main">
+<main class="collection-main category-main" id="mainContent">
     <section class="category-toolbar">
         <div class="category-toolbar-head">
             <div>
@@ -98,7 +100,7 @@
 </main>
 
 <button type="button" class="back-to-top" id="backToTopBtn" aria-label="Back to top">&#8593;</button>
-<div class="toast-host" id="toastHost"></div>
+<div class="toast-host" id="toastHost" aria-live="polite" aria-atomic="true"></div>
 
 <script src="cart-core.js"></script>
 <script src="category.js"></script>

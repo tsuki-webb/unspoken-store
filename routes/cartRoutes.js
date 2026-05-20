@@ -312,7 +312,6 @@ function formatCartItems(cartDoc) {
                 lineTotal,
                 isAvailable: true,
                 name: String(item.productName || customPreset.presetName || "Custom T-Shirt"),
-                subtitle: `${toTitleCase(fit)} | ${baseColor}`,
                 image: String(item.productImage || buildCustomPresetImage(baseColor, fit)),
                 gender: String(customPreset.targetGender || ""),
                 type: "tshirt",
@@ -331,7 +330,6 @@ function formatCartItems(cartDoc) {
             lineTotal,
             isAvailable: !!productDoc,
             name: String(productDoc?.name || item.productName || "Product"),
-            subtitle: String(productDoc?.subtitle || ""),
             image: String(getProductImage(productDoc) || item.productImage || ""),
             gender: String(productDoc?.gender || ""),
             type: String(productDoc?.type || ""),
@@ -344,7 +342,7 @@ function formatCartItems(cartDoc) {
 async function getHydratedCart(userEmail) {
     return Cart.findOne({ userEmail }).populate(
         "items.product",
-        "name subtitle price images image gender type fit"
+        "name price images image gender type fit"
     )
 }
 
@@ -423,7 +421,7 @@ router.post("/items", async (req, res) => {
             return res.status(400).json({ error: "Invalid product id." })
         }
 
-        const product = await Product.findById(productId).select("name subtitle price images image")
+        const product = await Product.findById(productId).select("name price images image")
 
         if (!product) {
             return res.status(404).json({ error: "Product not found." })

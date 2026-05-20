@@ -6,10 +6,12 @@
 <title>Your Cart</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="brand.css">
+<link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="cart.css">
 </head>
 <body>
 
+<a class="skip-link" href="#mainContent">Skip to content</a>
 <header class="cart-nav">
     <a class="logo" href="index.html" aria-label="Home">
         <img class="brand-logo" src="assets/logo/unspoken-store-logo.svg" alt="Store logo">
@@ -26,7 +28,7 @@
     </a>
 </header>
 
-<main class="cart-layout">
+<main class="cart-layout" id="mainContent">
     <section class="cart-items-panel">
         <div class="panel-head">
             <div>
@@ -76,10 +78,10 @@
                 <span>Shipping</span>
                 <strong id="summaryShipping">&#8377; 0</strong>
             </div>
-            <div class="summary-row">
+            <!-- <div class="summary-row">
                 <span>Tax (5%)</span>
                 <strong id="summaryTax">&#8377; 0</strong>
-            </div>
+            </div> -->
             <div class="summary-total">
                 <span>Total</span>
                 <strong id="summaryGrandTotal">&#8377; 0</strong>
@@ -98,11 +100,11 @@
     </aside>
 </main>
 
-<div class="toast" id="cartToast"></div>
+<div class="toast" id="cartToast" aria-live="polite" aria-atomic="true"></div>
 
 <section class="checkout-modal hidden" id="checkoutModal" aria-hidden="true">
     <div class="checkout-dialog" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle">
-        <button type="button" class="checkout-close-btn" id="checkoutCloseBtn" aria-label="Close checkout">x</button>
+        <button type="button" class="checkout-close-btn" id="checkoutCloseBtn" aria-label="Close checkout">&times;</button>
 
         <div class="checkout-grid">
             <form class="checkout-form" id="checkoutForm" novalidate>

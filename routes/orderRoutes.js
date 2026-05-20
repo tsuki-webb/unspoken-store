@@ -214,7 +214,6 @@ function formatCartItemsForOrder(cartDoc) {
                 unitPrice: Number(unitPrice.toFixed(2)),
                 lineTotal,
                 name: String(item.productName || customPreset.presetName || "Custom T-Shirt"),
-                subtitle: `${toTitleCase(customPreset.tshirtFit || "oversized")} | ${String(customPreset.baseColor || "Black")}`,
                 image: String(item.productImage || ""),
                 gender: String(customPreset.targetGender || ""),
                 type: "tshirt",
@@ -231,7 +230,6 @@ function formatCartItemsForOrder(cartDoc) {
             unitPrice: Number(unitPrice.toFixed(2)),
             lineTotal,
             name: String(productDoc?.name || item.productName || "Product"),
-            subtitle: String(productDoc?.subtitle || ""),
             image: String(getProductImage(productDoc) || item.productImage || ""),
             gender: String(productDoc?.gender || ""),
             type: String(productDoc?.type || ""),
@@ -452,7 +450,7 @@ async function createOrderFromCart({
 
     const cart = await Cart.findOne({ userEmail }).populate(
         "items.product",
-        "name subtitle price images image gender type fit"
+        "name price images image gender type fit"
     )
 
     if (!cart || !Array.isArray(cart.items) || !cart.items.length) {
@@ -489,7 +487,7 @@ async function createOrderFromCart({
         await cart.save()
         updatedCart = await Cart.findOne({ userEmail }).populate(
             "items.product",
-            "name subtitle price images image gender type fit"
+            "name price images image gender type fit"
         )
     }
 
@@ -506,7 +504,7 @@ router.get("/checkout/options", async (req, res) => {
 
         const cart = await Cart.findOne({ userEmail }).populate(
             "items.product",
-            "name subtitle price images image gender type fit"
+            "name price images image gender type fit"
         )
 
         const cartPayload = toCartResponse(cart || { userEmail, items: [] })

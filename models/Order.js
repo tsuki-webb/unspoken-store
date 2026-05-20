@@ -103,10 +103,6 @@ const orderItemSchema = new mongoose.Schema({
         type: String,
         default: "Product"
     },
-    subtitle: {
-        type: String,
-        default: ""
-    },
     image: {
         type: String,
         default: ""
@@ -292,7 +288,7 @@ const orderSchema = new mongoose.Schema({
     },
     taxRate: {
         type: Number,
-        default: 0.05
+        default: 0.0
     },
     grandTotal: {
         type: Number,

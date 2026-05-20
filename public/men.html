@@ -5,11 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Men Collection</title>
 <link rel="stylesheet" href="brand.css">
+<link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="collection.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body class="collection-page" data-collection="men">
 
+<a class="skip-link" href="#mainContent">Skip to content</a>
 <div class="scroll-progress" id="scrollProgress"></div>
 
 <header class="collection-nav">
@@ -28,9 +30,13 @@
     </a>
 </header>
 
-<main class="collection-main">
+<main class="collection-main" id="mainContent">
     <section class="collection-hero" id="collectionHero">
-        <img id="collectionHeroImage" src="" alt="Men collection hero">
+        <div class="collection-hero-slider" id="collectionHeroSlider" aria-label="Men collection hero banners">
+            <img id="collectionHeroImage" class="collection-hero-slide active" data-collection-hero-slide src="" alt="Men collection hero 1">
+            <img class="collection-hero-slide" data-collection-hero-slide src="" alt="Men collection hero 2">
+            <img class="collection-hero-slide" data-collection-hero-slide src="" alt="Men collection hero 3">
+        </div>
         <div class="hero-content">
             <p class="hero-eyebrow" id="heroEyebrow"></p>
             <h1 id="heroTitle"></h1>
@@ -41,13 +47,63 @@
             </div>
             <ul class="hero-stats" id="heroStats"></ul>
         </div>
+        <div class="collection-hero-dots" id="collectionHeroDots" aria-label="Choose collection hero banner"></div>
     </section>
 
     <section class="category-strip-wrap">
         <div class="category-strip-head">
             <h2>Shop by Categories</h2>
+            <button type="button" class="mobile-filter-toggle" id="mobileFilterToggle" aria-controls="filterPanel" aria-expanded="false">Filters & Search</button>
         </div>
         <div class="category-strip" id="categoryStrip"></div>
+    </section>
+
+    <section class="filter-panel" id="filterPanel" aria-label="Collection filters">
+        <div class="filter-mobile-head">
+            <h3>Refine Collection</h3>
+            <button type="button" class="filter-close-btn" id="filterCloseBtn" aria-label="Close filters">&times;</button>
+        </div>
+
+        <div class="filter-row primary">
+            <label class="filter-field">
+                <span>Search</span>
+                <input id="collectionSearchInput" type="text" placeholder="Search products, fits, and details">
+            </label>
+
+            <label class="filter-field">
+                <span>Sort</span>
+                <select id="collectionSortSelect">
+                    <option value="newest">Newest First</option>
+                    <option value="featured">Featured First</option>
+                    <option value="new_collection">New Collection</option>
+                    <option value="price_asc">Price: Low to High</option>
+                    <option value="price_desc">Price: High to Low</option>
+                </select>
+            </label>
+        </div>
+
+        <div class="filter-row">
+            <div class="filter-field">
+                <span>Product Types</span>
+                <div class="chip-row" id="quickTypeChips"></div>
+            </div>
+        </div>
+
+        <div class="filter-row">
+            <div class="filter-field">
+                <span>Highlights</span>
+                <div class="chip-row" id="flagChips"></div>
+            </div>
+        </div>
+
+        <div class="filter-row summary-row">
+            <p class="collection-filter-summary" id="collectionFilterSummary">All products in this collection.</p>
+            <div class="summary-actions">
+                <button type="button" id="savePresetBtn">Save Preset</button>
+                <button type="button" id="loadPresetBtn">Load Preset</button>
+                <button type="button" id="clearFiltersBtn">Clear Filters</button>
+            </div>
+        </div>
     </section>
 
     <section class="category-cards-wrap" aria-label="Category cards">
@@ -123,7 +179,7 @@
 </section>
 
 <button type="button" class="back-to-top" id="backToTopBtn" aria-label="Back to top">&#8593;</button>
-<div class="toast-host" id="toastHost"></div>
+<div class="toast-host" id="toastHost" aria-live="polite" aria-atomic="true"></div>
 
 <script src="cart-core.js"></script>
 <script src="collection-core.js"></script>

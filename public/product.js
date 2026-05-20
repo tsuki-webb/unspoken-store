@@ -10,6 +10,15 @@ const STOREFRONT_ALLOWED_TYPES_BY_GENDER = {
     unisex: new Set(["tshirt"])
 }
 
+function escapeHtml(value = "") {
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;")
+}
+
 function isStorefrontProductVisible(product) {
     const gender = String(product?.gender || "").trim().toLowerCase()
     const type = String(product?.type || "").trim().toLowerCase()
@@ -75,7 +84,6 @@ function renderProductMeta(product) {
 function renderMainProduct(product) {
     document.title = `${product.name} | Product`
     document.getElementById("productName").innerText = product.name
-    document.getElementById("productSubtitle").innerText = product.subtitle || ""
     document.getElementById("productPrice").innerText = formatCurrency(product.price)
 
     renderProductMeta(product)
@@ -88,17 +96,28 @@ function renderMainProduct(product) {
     mainImage.src = images[0]
 
     thumbContainer.innerHTML = images.map((img, index) => `
-        <img src="${img}"
-             class="${index === 0 ? "active" : ""}"
-             onclick='changeImage(${JSON.stringify(img)}, this)'>
+        <button
+            type="button"
+            class="thumbnail-btn ${index === 0 ? "active" : ""}"
+            data-image-src="${encodeURIComponent(String(img || ""))}"
+            aria-label="View product image ${index + 1}"
+        >
+            <img src="${escapeHtml(img)}" alt="${escapeHtml(product.name)} thumbnail ${index + 1}" loading="lazy" decoding="async">
+        </button>
     `).join("")
 
+    thumbContainer.querySelectorAll(".thumbnail-btn").forEach(button => {
+        button.addEventListener("click", () => {
+            changeImage(decodeURIComponent(button.dataset.imageSrc || ""), button)
+        })
+    })
+
     document.getElementById("detailsContent").innerHTML = `
-        <p><b>Material & Care:</b><br>${product.material || ""}<br>${product.care || ""}</p>
-        <p><b>Country of Origin:</b> ${product.countryOfOrigin || "India"}</p>
-        <p><b>Manufactured & Sold By:</b><br>${product.manufacturedBy || ""}</p>
-        <p>${product.address || ""}</p>
-        <p>${product.customerCare || ""}</p>
+        <p><b>Material & Care:</b><br>${escapeHtml(product.material || "")}<br>${escapeHtml(product.care || "")}</p>
+        <p><b>Country of Origin:</b> ${escapeHtml(product.countryOfOrigin || "India")}</p>
+        <p><b>Manufactured & Sold By:</b><br>${escapeHtml(product.manufacturedBy || "")}</p>
+        <p>${escapeHtml(product.address || "")}</p>
+        <p>${escapeHtml(product.customerCare || "")}</p>
     `
 
     document.getElementById("descContent").innerText =
@@ -127,12 +146,12 @@ function pickUnique(candidates, usedIds, limit) {
 
 function renderRelatedCard(product) {
     return `
-        <article class="related-card" onclick="goToProduct('${product._id}')">
-            <img src="${product.images?.[0] || product.image}" alt="${product.name}">
-            <h4>${product.name}</h4>
+        <article class="related-card" onclick="goToProduct('${encodeURIComponent(String(product._id || ""))}')">
+            <img src="${escapeHtml(product.images?.[0] || product.image || "")}" alt="${escapeHtml(product.name)}" loading="lazy" decoding="async">
+            <h4>${escapeHtml(product.name)}</h4>
             <div class="meta">
-                <span>${getTypeLabel(product.type)}</span>
-                <b>${formatCurrency(product.price)}</b>
+                <span>${escapeHtml(getTypeLabel(product.type))}</span>
+                <b>${escapeHtml(formatCurrency(product.price))}</b>
             </div>
         </article>
     `
@@ -275,8 +294,8 @@ function changeImage(src, el) {
         main.style.opacity = 1
     }, 150)
 
-    document.querySelectorAll(".thumbnail-list img")
-        .forEach(img => img.classList.remove("active"))
+    document.querySelectorAll(".thumbnail-btn")
+        .forEach(button => button.classList.remove("active"))
 
     el.classList.add("active")
 }
@@ -289,11 +308,14 @@ function setupAccordion() {
 
         if (index === 0 && content) {
             content.style.display = "block"
+            title.setAttribute("aria-expanded", "true")
         }
 
-        title.onclick = () => {
-            content.style.display = content.style.display === "block" ? "none" : "block"
-        }
+        title.addEventListener("click", () => {
+            const isOpen = content.style.display === "block"
+            content.style.display = isOpen ? "none" : "block"
+            title.setAttribute("aria-expanded", isOpen ? "false" : "true")
+        })
     })
 }
 
@@ -319,7 +341,7 @@ function setupSizes() {
 }
 
 function goToProduct(productId) {
-    window.location.href = `/product.html?id=${productId}`
+    window.location.href = `/product.html?id=${decodeURIComponent(String(productId || ""))}`
 }
 
 function showToast(message) {
@@ -420,8 +442,8 @@ function bindCartActions() {
     }
 }
 
-window.onload = () => {
+document.addEventListener("DOMContentLoaded", () => {
     loadProduct()
     setupAccordion()
     setupSizes()
-}
+})

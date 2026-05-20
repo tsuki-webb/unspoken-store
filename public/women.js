@@ -7,6 +7,7 @@ initCollectionPage({
     heroSubtitle: "Refined streetwear energy blending softness, edge, and modern movement.",
     heroFallbackImage: "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1800&q=80",
     bannerType: "womenHero",
+    bannerTypes: ["womenHero", "womenHero2", "womenHero3"],
     quickTypes: [
         { value: "all", label: "All" },
         { value: "tshirt", label: "T-Shirts" },

@@ -7,6 +7,7 @@ initCollectionPage({
     heroSubtitle: "Built for everyday dominance with elevated basics and statement drops.",
     heroFallbackImage: "https://images.unsplash.com/photo-1520975916090-3105956dac38?auto=format&fit=crop&w=1800&q=80",
     bannerType: "menHero",
+    bannerTypes: ["menHero", "menHero2", "menHero3"],
     quickTypes: [
         { value: "all", label: "All" },
         { value: "tshirt", label: "T-Shirts" },

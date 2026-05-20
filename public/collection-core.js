@@ -96,6 +96,17 @@
         ]
     }
 
+    function normalizeBannerTypes(config) {
+        const rawTypes = Array.isArray(config?.bannerTypes) && config.bannerTypes.length
+            ? config.bannerTypes
+            : [config?.bannerType]
+
+        return rawTypes
+            .map(type => String(type || "").trim())
+            .filter(Boolean)
+            .slice(0, 3)
+    }
+
     function readRecentEntries() {
         const raw = localStorage.getItem(RECENTLY_VIEWED_KEY)
         if (!raw) return []
@@ -130,7 +141,6 @@
 
         return [
             product.name,
-            product.subtitle,
             product.description,
             product.gender,
             product.type,
@@ -193,8 +203,10 @@
     function initCollectionPage(userConfig) {
         const config = {
             quickTypes: normalizeQuickTypes(userConfig),
+            bannerTypes: normalizeBannerTypes(userConfig),
             ...userConfig
         }
+        config.bannerTypes = normalizeBannerTypes(config)
 
         const state = {
             search: "",
@@ -213,10 +225,15 @@
         let compareIds = []
         let quickViewProductId = null
         let hasHandledInitialHash = false
+        let heroSlideIndex = 0
+        let heroSlideCount = 0
+        let heroSlideTimer = null
 
         const dom = {
             body: document.body,
             heroImage: document.getElementById("collectionHeroImage"),
+            heroSlides: Array.from(document.querySelectorAll("[data-collection-hero-slide]")),
+            heroDots: document.getElementById("collectionHeroDots"),
             heroEyebrow: document.getElementById("heroEyebrow"),
             heroTitle: document.getElementById("heroTitle"),
             heroSubtitle: document.getElementById("heroSubtitle"),
@@ -264,8 +281,97 @@
             const quickViewOpen = !!dom.quickViewModal?.classList.contains("active")
             const compareModalOpen = !!dom.compareModal?.classList.contains("active")
             const filtersOpen = dom.body.classList.contains("filters-open")
+            const filterDrawerHidden = window.innerWidth <= 900 ? !filtersOpen : false
 
             dom.body.classList.toggle("no-scroll", quickViewOpen || compareModalOpen || filtersOpen)
+            dom.mobileFilterToggle?.setAttribute("aria-expanded", filtersOpen ? "true" : "false")
+            dom.filterPanel?.setAttribute("aria-hidden", filterDrawerHidden ? "true" : "false")
+        }
+
+        function stopHeroSlider() {
+            if (heroSlideTimer) {
+                clearInterval(heroSlideTimer)
+                heroSlideTimer = null
+            }
+        }
+
+        function setHeroSlide(index) {
+            if (!heroSlideCount) return
+
+            heroSlideIndex = ((Number(index) || 0) + heroSlideCount) % heroSlideCount
+
+            dom.heroSlides.forEach((slide, slideIndex) => {
+                const isActive = slideIndex === heroSlideIndex
+                slide.classList.toggle("active", isActive)
+                slide.setAttribute("aria-hidden", isActive ? "false" : "true")
+            })
+
+            dom.heroDots?.querySelectorAll("[data-hero-slide-index]").forEach(dot => {
+                const isActive = Number(dot.dataset.heroSlideIndex) === heroSlideIndex
+                dot.classList.toggle("active", isActive)
+                dot.setAttribute("aria-current", isActive ? "true" : "false")
+            })
+        }
+
+        function startHeroSlider() {
+            stopHeroSlider()
+            if (heroSlideCount <= 1) return
+
+            heroSlideTimer = setInterval(() => {
+                setHeroSlide(heroSlideIndex + 1)
+            }, 4500)
+        }
+
+        function renderHeroDots() {
+            if (!dom.heroDots) return
+
+            if (heroSlideCount <= 1) {
+                dom.heroDots.innerHTML = ""
+                return
+            }
+
+            dom.heroDots.innerHTML = Array.from({ length: heroSlideCount }, (_, index) => `
+                <button
+                    type="button"
+                    class="collection-hero-dot ${index === 0 ? "active" : ""}"
+                    data-hero-slide-index="${index}"
+                    aria-label="Show hero banner ${index + 1}"
+                    aria-current="${index === 0 ? "true" : "false"}"
+                ></button>
+            `).join("")
+        }
+
+        function renderHeroSlides(imageUrls = []) {
+            const slides = imageUrls
+                .map(url => String(url || "").trim())
+                .filter(Boolean)
+
+            if (!slides.length && config.heroFallbackImage) {
+                slides.push(config.heroFallbackImage)
+            }
+
+            const limitedSlides = slides.slice(0, dom.heroSlides.length || 1)
+            heroSlideCount = limitedSlides.length
+
+            if (dom.heroSlides.length) {
+                dom.heroSlides.forEach((slide, index) => {
+                    const imageUrl = limitedSlides[index] || ""
+                    slide.hidden = !imageUrl
+                    slide.src = imageUrl
+                    slide.alt = `${config.pageTitle || "Collection"} hero ${index + 1}`
+                    slide.classList.toggle("active", index === 0 && !!imageUrl)
+                    slide.setAttribute("aria-hidden", index === 0 && !!imageUrl ? "false" : "true")
+                })
+            } else if (dom.heroImage && limitedSlides[0]) {
+                dom.heroImage.src = limitedSlides[0]
+                dom.heroImage.alt = `${config.pageTitle || "Collection"} hero`
+                heroSlideCount = 1
+            }
+
+            heroSlideIndex = 0
+            renderHeroDots()
+            setHeroSlide(0)
+            startHeroSlider()
         }
 
         function syncPageMeta() {
@@ -275,10 +381,7 @@
             if (dom.heroTitle) dom.heroTitle.textContent = config.heroTitle || config.pageTitle
             if (dom.heroSubtitle) dom.heroSubtitle.textContent = config.heroSubtitle || ""
 
-            if (dom.heroImage) {
-                dom.heroImage.src = config.heroFallbackImage
-                dom.heroImage.alt = `${config.pageTitle} hero`
-            }
+            renderHeroSlides([config.heroFallbackImage])
 
             document.querySelectorAll(".collection-nav-links a[data-nav]").forEach(link => {
                 const isActive = String(link.dataset.nav || "") === String(config.gender || "")
@@ -650,33 +753,25 @@
 
         function renderProductCard(product) {
             const productId = String(product._id)
-            const compareActive = compareIds.includes(productId)
             const featured = isEnabledFlag(product.featured)
             const isNew = isEnabledFlag(product.newCollection)
             const image = getProductImage(product)
-            const subtitle = String(product.subtitle || "").trim()
 
             return `
                 <article class="product-card" data-product-id="${escapeHtml(productId)}">
-                    <div class="product-media">
+                    <a class="product-media" href="product.html?id=${escapeHtml(productId)}" aria-label="View ${escapeHtml(product.name)}">
                         <img src="${escapeHtml(image)}" alt="${escapeHtml(product.name)}" loading="lazy" decoding="async">
                         <div class="product-badges">
                             ${featured ? '<span class="product-badge featured">Featured</span>' : ""}
                             ${isNew ? '<span class="product-badge new">New</span>' : ""}
                         </div>
-                    </div>
+                    </a>
                     <div class="product-info">
-                        <p class="product-meta">${escapeHtml(buildProductMetaLabel(product))}</p>
                         <h3 class="product-name">${escapeHtml(product.name)}</h3>
-                        <p class="product-subtitle">${escapeHtml(subtitle || "Premium quality apparel for everyday streetwear.")}</p>
+                        <p class="product-meta">${escapeHtml(buildProductMetaLabel(product))}</p>
                         <p class="product-price">${escapeHtml(formatCurrency(product.price))}</p>
                         <div class="product-actions">
-                            <a class="primary" href="product.html?id=${escapeHtml(productId)}">View</a>
-                            <button type="button" data-action="add-to-cart" data-id="${escapeHtml(productId)}">Add to Cart</button>
-                            <button type="button" data-action="quick-view" data-id="${escapeHtml(productId)}">Quick View</button>
-                            <button type="button" data-action="compare-toggle" data-id="${escapeHtml(productId)}" class="${compareActive ? "compare-active" : ""}">
-                                ${compareActive ? "Compared" : "Compare"}
-                            </button>
+                            <button type="button" class="primary" data-action="add-to-cart" data-id="${escapeHtml(productId)}">Add to Cart</button>
                         </div>
                     </div>
                 </article>
@@ -931,7 +1026,6 @@
                     </div>
                     <div class="quick-view-meta">
                         <h4>${escapeHtml(product.name)}</h4>
-                        <p>${escapeHtml(product.subtitle || "Premium streetwear design with clean finish.")}</p>
                         <p>${escapeHtml(buildProductMetaLabel(product))}</p>
                         <div class="quick-view-price">${escapeHtml(formatCurrency(product.price))}</div>
                         <div class="quick-view-actions">
@@ -1270,13 +1364,16 @@
                     .filter(isStorefrontProductVisible)
                 categoryCards = Array.isArray(cards) ? cards : []
 
-                const banner = Array.isArray(banners)
-                    ? banners.find(item => String(item.type || "") === String(config.bannerType || ""))
-                    : null
+                const bannerMap = new Map(
+                    (Array.isArray(banners) ? banners : [])
+                        .map(banner => [String(banner?.type || "").trim(), banner])
+                        .filter(([type]) => type)
+                )
+                const heroImages = config.bannerTypes
+                    .map(type => bannerMap.get(type)?.image)
+                    .filter(Boolean)
 
-                if (banner?.image && dom.heroImage) {
-                    dom.heroImage.src = banner.image
-                }
+                renderHeroSlides(heroImages)
 
                 buildHeroStats()
                 renderEverything()
@@ -1395,6 +1492,13 @@
             dom.errorRetryBtn?.addEventListener("click", loadData)
             dom.savePresetBtn?.addEventListener("click", persistPreset)
             dom.loadPresetBtn?.addEventListener("click", loadPreset)
+            dom.heroDots?.addEventListener("click", event => {
+                const dot = event.target.closest("[data-hero-slide-index]")
+                if (!dot) return
+
+                setHeroSlide(Number(dot.dataset.heroSlideIndex || 0))
+                startHeroSlider()
+            })
 
             dom.mobileFilterToggle?.addEventListener("click", () => {
                 dom.body.classList.toggle("filters-open")

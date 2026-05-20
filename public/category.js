@@ -427,7 +427,6 @@
 
             const searchBlob = [
                 product.name,
-                product.subtitle,
                 product.description,
                 product.type,
                 product.fit
@@ -528,11 +527,10 @@
         const productId = String(product._id || "")
         const featured = isEnabledFlag(product.featured)
         const isNew = isEnabledFlag(product.newCollection)
-        const subtitle = normalizeText(product.subtitle) || "Premium quality apparel for everyday streetwear."
 
         return `
             <article class="product-card" data-product-id="${escapeHtml(productId)}">
-                <div class="product-media">
+                <a class="product-media" href="product.html?id=${escapeHtml(productId)}" aria-label="View ${escapeHtml(product.name)}">
                     <img
                         src="${escapeHtml(getProductImage(product))}"
                         alt="${escapeHtml(product.name)}"
@@ -544,15 +542,13 @@
                         ${featured ? '<span class="product-badge featured">Featured</span>' : ""}
                         ${isNew ? '<span class="product-badge new">New</span>' : ""}
                     </div>
-                </div>
+                </a>
                 <div class="product-info">
-                    <p class="product-meta">${escapeHtml(buildProductMetaLabel(product))}</p>
                     <h3 class="product-name">${escapeHtml(product.name)}</h3>
-                    <p class="product-subtitle">${escapeHtml(subtitle)}</p>
+                    <p class="product-meta">${escapeHtml(buildProductMetaLabel(product))}</p>
                     <p class="product-price">${escapeHtml(formatCurrency(product.price))}</p>
                     <div class="product-actions">
-                        <a class="primary" href="product.html?id=${escapeHtml(productId)}">View</a>
-                        <button type="button" data-action="add-to-cart" data-id="${escapeHtml(productId)}">Add to Cart</button>
+                        <button type="button" class="primary" data-action="add-to-cart" data-id="${escapeHtml(productId)}">Add to Cart</button>
                     </div>
                 </div>
             </article>

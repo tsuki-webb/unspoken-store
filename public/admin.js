@@ -31,9 +31,15 @@ const STATIC_BANNER_LABELS = {
     homeWomenSection: "Home Women Section",
     homeUnisexSection: "Home Unisex Section",
     homeCustomDesign: "Home Custom Design Banner",
-    menHero: "Men Page Hero",
-    womenHero: "Women Page Hero",
-    unisexHero: "Unisex Page Hero"
+    menHero: "Men Page Hero 1",
+    menHero2: "Men Page Hero 2",
+    menHero3: "Men Page Hero 3",
+    womenHero: "Women Page Hero 1",
+    womenHero2: "Women Page Hero 2",
+    womenHero3: "Women Page Hero 3",
+    unisexHero: "Unisex Page Hero 1",
+    unisexHero2: "Unisex Page Hero 2",
+    unisexHero3: "Unisex Page Hero 3"
 }
 const CUSTOM_DESIGN_STATUS_LABELS = {
     pending: "Pending",
@@ -1016,7 +1022,6 @@ async function openPopup(id) {
     }
 
     document.getElementById("editName").value = p.name || ""
-    document.getElementById("editSubtitle").value = p.subtitle || ""
     document.getElementById("editPrice").value = p.price || ""
     document.getElementById("editGender").value = p.gender || "men"
     updateTypeOptions("editGender", "editType", "editFit", p.type || "tshirt")
@@ -1127,7 +1132,6 @@ async function saveEdit() {
     const formData = new FormData()
 
     formData.append("name", document.getElementById("editName").value)
-    formData.append("subtitle", document.getElementById("editSubtitle").value)
     formData.append("price", document.getElementById("editPrice").value)
     formData.append("gender", document.getElementById("editGender").value)
     formData.append("type", type)
@@ -1936,6 +1940,41 @@ function toOrderSourceLabel(source) {
         .join(" ")
 }
 
+function getOrderItemTypeLabel(type) {
+    const normalized = normalizeText(type).toLowerCase()
+    if (normalized === "tshirt") return "T-Shirt"
+    if (normalized === "top") return "Top"
+    if (normalized === "shirt") return "Shirt"
+    if (normalized === "short") return "Shorts"
+    if (normalized === "sweatpant") return "Sweatpants"
+    return normalized
+        ? normalized
+            .replace(/[-_]+/g, " ")
+            .split(" ")
+            .filter(Boolean)
+            .map(piece => piece[0].toUpperCase() + piece.slice(1).toLowerCase())
+            .join(" ")
+        : "Product"
+}
+
+function getOrderItemMetaLabel(item) {
+    const itemType = String(item?.itemType || "product").trim().toLowerCase()
+
+    if (itemType === "custom-preset") {
+        const preset = item?.customPreset && typeof item.customPreset === "object" ? item.customPreset : {}
+        const gender = normalizeText(preset.targetGender || item?.gender || "unisex").toUpperCase()
+        const fit = normalizeText(preset.tshirtFit || item?.fit).toUpperCase()
+        const color = normalizeText(preset.baseColor)
+        return [gender, "CUSTOM T-SHIRT", fit, color].filter(Boolean).join(" | ")
+    }
+
+    const gender = normalizeText(item?.gender).toUpperCase()
+    const type = getOrderItemTypeLabel(item?.type).toUpperCase()
+    const fit = normalizeText(item?.fit).toUpperCase()
+    const parts = [gender, type, fit].filter(Boolean)
+    return parts.length ? parts.join(" | ") : "Product"
+}
+
 function showOrdersFeedback(message, tone = "muted") {
     const feedback = document.getElementById("ordersFeedback")
     if (!feedback) return
@@ -1971,7 +2010,7 @@ function applyOrderFilters(orders, filters) {
 
         const lineItems = Array.isArray(order?.items) ? order.items : []
         const itemText = lineItems
-            .map(item => `${item?.name || ""} ${item?.subtitle || ""}`.trim())
+            .map(item => `${item?.name || ""} ${getOrderItemMetaLabel(item)}`.trim())
             .join(" ")
             .toLowerCase()
 
@@ -2075,7 +2114,7 @@ function renderOrderItemsMarkup(order) {
     const rows = previewItems.map(item => {
         const image = normalizeText(item?.image)
         const itemName = normalizeText(item?.name) || "Item"
-        const itemSubtitle = normalizeText(item?.subtitle)
+        const itemMeta = getOrderItemMetaLabel(item)
         const size = normalizeText(item?.size) || "-"
         const quantity = Number(item?.quantity || 0) || 0
         const lineTotal = formatCurrencyInr(item?.lineTotal || 0)
@@ -2093,7 +2132,7 @@ function renderOrderItemsMarkup(order) {
                 </div>
                 <div class="order-item-meta">
                     <p class="order-item-name">${escapeHtml(itemName)}</p>
-                    <p class="order-item-sub">${escapeHtml(itemSubtitle || "No subtitle")}</p>
+                    <p class="order-item-sub">${escapeHtml(itemMeta)}</p>
                     <p class="order-item-sub">Size ${escapeHtml(size)} | Qty ${escapeHtml(String(quantity))}</p>
                 </div>
                 <div class="order-item-end">

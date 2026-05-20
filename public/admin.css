@@ -1079,11 +1079,20 @@ h3{
 
     .sidebar nav{
         flex-direction:row;
-        flex-wrap:wrap;
+        flex-wrap:nowrap;
+        overflow-x:auto;
+        padding-bottom:4px;
+        scrollbar-width:none;
+    }
+
+    .sidebar nav::-webkit-scrollbar{
+        display:none;
     }
 
     .nav-btn{
         width:auto;
+        flex:0 0 auto;
+        white-space:nowrap;
     }
 
     .main{

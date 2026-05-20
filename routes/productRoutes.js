@@ -163,7 +163,7 @@ router.get("/", async (req, res) => {
             query.newCollection = normalizeBoolean(req.query.newCollection, false)
         }
 
-        let products = await Product.find(query).sort({ createdAt: -1 })
+        let products = await Product.find(query).select("-subtitle").sort({ createdAt: -1 })
 
         const search = normalizeText(req.query.search)
 
@@ -172,7 +172,6 @@ router.get("/", async (req, res) => {
             products = products.filter(product => {
                 const matchText = [
                     product.name,
-                    product.subtitle,
                     product.description
                 ]
                     .map(value => String(value || "").toLowerCase())
@@ -278,7 +277,6 @@ router.put("/:id", upload.array("newImages", 5), async (req, res) => {
             featured,
             newCollection,
             name,
-            subtitle,
             price,
             material,
             care,
@@ -337,30 +335,34 @@ router.put("/:id", upload.array("newImages", 5), async (req, res) => {
             }
         }
 
+        const updatePayload = {
+            name,
+            price,
+            gender: normalizedCategory.gender,
+            type: normalizedCategory.type,
+            fit: normalizedCategory.fit,
+            featured: normalizeBoolean(featured, existingProduct.featured),
+            newCollection: shouldBeInNewCollection,
+            newCollectionPriority: resolvedNewCollectionPriority,
+            material,
+            care,
+            manufacturedBy,
+            address,
+            customerCare,
+            countryOfOrigin,
+            description,
+            artistDetails,
+            images: finalImages
+        }
+
         const updated = await Product.findByIdAndUpdate(
             req.params.id,
             {
-                name,
-                subtitle,
-                price,
-                gender: normalizedCategory.gender,
-                type: normalizedCategory.type,
-                fit: normalizedCategory.fit,
-                featured: normalizeBoolean(featured, existingProduct.featured),
-                newCollection: shouldBeInNewCollection,
-                newCollectionPriority: resolvedNewCollectionPriority,
-                material,
-                care,
-                manufacturedBy,
-                address,
-                customerCare,
-                countryOfOrigin,
-                description,
-                artistDetails,
-                images: finalImages
+                $set: updatePayload,
+                $unset: { subtitle: "" }
             },
-            { new: true, runValidators: true }
-        )
+            { new: true, runValidators: true, strict: false }
+        ).select("-subtitle")
 
         res.json(updated)
 

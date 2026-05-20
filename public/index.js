@@ -76,6 +76,14 @@ function escapeHtml(value = "") {
         .replace(/'/g, "&#39;")
 }
 
+function isEnabledFlag(value) {
+    if (typeof value === "boolean") return value
+    if (typeof value === "number") return value === 1
+
+    const normalized = String(value || "").trim().toLowerCase()
+    return normalized === "true" || normalized === "1" || normalized === "yes" || normalized === "on"
+}
+
 function isMenuOpen() {
     return !!sideMenu && sideMenu.classList.contains("active")
 }
@@ -156,13 +164,12 @@ function getMatchingProducts(query, limit = 6) {
     return menuProductsCache
         .filter(product => {
             const name = String(product.name || "").toLowerCase()
-            const subtitle = String(product.subtitle || "").toLowerCase()
             const type = String(product.type || "").toLowerCase()
             const typeLabel = getMenuTypeLabel(product.type).toLowerCase()
             const gender = String(product.gender || "").toLowerCase()
             const fit = String(product.fit || "").toLowerCase()
 
-            return `${name} ${subtitle} ${type} ${typeLabel} ${gender} ${fit}`.includes(normalized)
+            return `${name} ${type} ${typeLabel} ${gender} ${fit}`.includes(normalized)
         })
         .slice(0, limit)
 }
@@ -185,11 +192,11 @@ function renderMenuSearchResults(query = "") {
     }
 
     menuSearchResults.innerHTML = matches.map(product => `
-        <a class="menu-search-item" href="product.html?id=${product._id}">
-            <img src="${product.images?.[0] || product.image}" alt="${product.name}">
+        <a class="menu-search-item" href="product.html?id=${encodeURIComponent(String(product._id || ""))}">
+            <img src="${escapeHtml(product.images?.[0] || product.image || "")}" alt="${escapeHtml(product.name)}" loading="lazy" decoding="async">
             <div>
-                <h4>${product.name}</h4>
-                <p>${formatMenuProductType(product)} | &#8377; ${product.price}</p>
+                <h4>${escapeHtml(product.name)}</h4>
+                <p>${escapeHtml(formatMenuProductType(product))} | &#8377; ${escapeHtml(product.price)}</p>
             </div>
         </a>
     `).join("")
@@ -216,11 +223,11 @@ function renderHomeSearchResults(query = "") {
 
     homeSearchResults.classList.add("active")
     homeSearchResults.innerHTML = matches.map(product => `
-        <a class="home-search-item" href="product.html?id=${product._id}">
-            <img src="${product.images?.[0] || product.image}" alt="${product.name}">
+        <a class="home-search-item" href="product.html?id=${encodeURIComponent(String(product._id || ""))}">
+            <img src="${escapeHtml(product.images?.[0] || product.image || "")}" alt="${escapeHtml(product.name)}" loading="lazy" decoding="async">
             <div>
-                <h4>${product.name}</h4>
-                <p>${formatMenuProductType(product)} | &#8377; ${product.price}</p>
+                <h4>${escapeHtml(product.name)}</h4>
+                <p>${escapeHtml(formatMenuProductType(product))} | &#8377; ${escapeHtml(product.price)}</p>
             </div>
         </a>
     `).join("")
@@ -599,13 +606,18 @@ function updateNavbarUserState(){
 
 function closeProfileMenu(){
     const menu = document.getElementById("profileMenu")
+    const trigger = document.querySelector(".profile-circle")
     if(menu) menu.classList.remove("active")
+    if (trigger) trigger.setAttribute("aria-expanded", "false")
 }
 
 function toggleProfileMenu(){
     const menu = document.getElementById("profileMenu")
+    const trigger = document.querySelector(".profile-circle")
     if(!menu) return
-    menu.classList.toggle("active")
+    const isOpen = !menu.classList.contains("active")
+    menu.classList.toggle("active", isOpen)
+    if (trigger) trigger.setAttribute("aria-expanded", isOpen ? "true" : "false")
 }
 
 function viewMyAccount() {
@@ -700,19 +712,40 @@ window.quickAddToCart = async function(productId, buttonEl) {
     }
 }
 
+function renderHomeProductCard(product) {
+    const productId = encodeURIComponent(String(product?._id || ""))
+    const productName = escapeHtml(product?.name || "Store Product")
+    const productImage = escapeHtml(product?.images?.[0] || product?.image || "")
+    const productPrice = escapeHtml(product?.price)
+    const productMeta = escapeHtml(formatMenuProductType(product))
+    const badges = [
+        isEnabledFlag(product?.newCollection) ? '<span class="home-product-badge new">New</span>' : "",
+        isEnabledFlag(product?.featured) ? '<span class="home-product-badge featured">Featured</span>' : ""
+    ].filter(Boolean).join("")
+
+    return `
+        <article class="product-card" onclick="window.location.href='product.html?id=${productId}'">
+            <div class="home-product-media">
+                <img src="${productImage}" alt="${productName}" loading="lazy" decoding="async">
+                ${badges ? `<div class="home-product-badges">${badges}</div>` : ""}
+            </div>
+            <div class="home-product-copy">
+                <h4>${productName}</h4>
+                <p class="home-product-meta">${productMeta}</p>
+                <div class="home-product-footer">
+                    <span>&#8377; ${productPrice}</span>
+                    <button class="home-add-cart-btn" type="button" onclick="event.stopPropagation(); quickAddToCart('${escapeHtml(String(product?._id || ""))}', this)">Add to Cart</button>
+                </div>
+            </div>
+        </article>
+    `
+}
+
 // ================= NEW COLLECTION =================
 async function loadNewCollection() {
     try {
         const res = await fetch("/api/products")
         const data = await res.json()
-
-        function isEnabledFlag(value) {
-            if (typeof value === "boolean") return value
-            if (typeof value === "number") return value === 1
-
-            const normalized = String(value || "").trim().toLowerCase()
-            return normalized === "true" || normalized === "1" || normalized === "yes" || normalized === "on"
-        }
 
         function getPriorityValue(value) {
             const parsed = Number.parseInt(String(value ?? ""), 10)
@@ -742,32 +775,22 @@ async function loadNewCollection() {
         const topItems = filtered.slice(0, 6)
         const bottomItems = filtered.slice(6, 12)
 
-        function renderProductCards(items) {
-            return items.map(p => `
-                <div class="product-card" onclick="window.location.href='product.html?id=${p._id}'">
-                    <img src="${p.images?.[0] || p.image}">
-                    <h4>${p.name}</h4>
-                    <span>&#8377; ${p.price}</span>
-                    <button class="home-add-cart-btn" type="button" onclick="event.stopPropagation(); quickAddToCart('${p._id}', this)">Add to Cart</button>
-                </div>
-            `).join("")
-        }
-
         container.innerHTML = `
             <div class="featured-products-stack">
-                <div class="featured-row">
-                    ${renderProductCards(topItems)}
-                </div>
-                <div class="featured-row">
-                    ${renderProductCards(bottomItems)}
-                </div>
+                ${topItems.length ? `
+                    <div class="featured-row">
+                        ${topItems.map(renderHomeProductCard).join("")}
+                    </div>
+                ` : ""}
+                ${bottomItems.length ? `
+                    <div class="featured-row">
+                        ${bottomItems.map(renderHomeProductCard).join("")}
+                    </div>
+                ` : ""}
             </div>
 
-            <div class="cta-card featured-cta" onclick="window.location.href='men.html'">
-                <h3>Explore Now</h3>
-                <p>Discover the full collection</p>
-                <button>Shop</button>
-            </div>
+
+
         `
 
     } catch (err) {
@@ -792,14 +815,7 @@ async function loadPreview(gender, containerId) {
         container.innerHTML = ""
 
         filtered.forEach(p => {
-           container.innerHTML += `
-    <div class="product-card" onclick="window.location.href='product.html?id=${p._id}'">
-                    <img src="${p.images?.[0] || p.image}">
-                    <h4>${p.name}</h4>
-                    <span>&#8377; ${p.price}</span>
-                    <button class="home-add-cart-btn" type="button" onclick="event.stopPropagation(); quickAddToCart('${p._id}', this)">Add to Cart</button>
-                </div>
-            `
+           container.innerHTML += renderHomeProductCard(p)
         })
 
     } catch (err) {
@@ -884,13 +900,18 @@ function startCountdown() {
     else timeLeft = parseInt(timeLeft)
 
     function updateTimer(){
+        const hoursEl = document.getElementById("hours")
+        const minutesEl = document.getElementById("minutes")
+        const secondsEl = document.getElementById("seconds")
+        if (!hoursEl || !minutesEl || !secondsEl) return
+
         let h = Math.floor(timeLeft / 3600)
         let m = Math.floor((timeLeft % 3600) / 60)
         let s = timeLeft % 60
 
-        document.getElementById("hours").innerText = String(h).padStart(2, '0')
-        document.getElementById("minutes").innerText = String(m).padStart(2, '0')
-        document.getElementById("seconds").innerText = String(s).padStart(2, '0')
+        hoursEl.innerText = String(h).padStart(2, '0')
+        minutesEl.innerText = String(m).padStart(2, '0')
+        secondsEl.innerText = String(s).padStart(2, '0')
 
         timeLeft--
 
@@ -901,6 +922,19 @@ function startCountdown() {
 
     updateTimer()
     setInterval(updateTimer, 1000)
+}
+
+function bindHomeEnhancements() {
+    const reviewButton = document.querySelector(".thoughts-btn")
+    reviewButton?.addEventListener("click", () => {
+        document.getElementById("footerContact")?.scrollIntoView({ behavior: "smooth", block: "start" })
+    })
+
+    window.addEventListener("keydown", event => {
+        if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return
+        if (event.key === "ArrowLeft") prevSlide()
+        if (event.key === "ArrowRight") nextSlide()
+    })
 }
 
 
@@ -923,5 +957,45 @@ window.addEventListener("load", () => {
     loadPreview("unisex", "unisexPreview")
     loadBanners()
     startCountdown()
+    bindHomeEnhancements()
 })
 
+// ================= MOBILE REVIEWS AUTO SCROLL =================
+
+// ================= MOBILE REVIEWS AUTO SLIDER =================
+
+function startVoicesAutoSlider() {
+
+    if (window.innerWidth > 980) return
+
+    const rows = document.querySelectorAll(".voices-row")
+
+    rows.forEach(row => {
+
+        const cards = row.querySelectorAll(".voice-card, .thoughts-card")
+
+        if (!cards.length) return
+
+        let index = 0
+
+        setInterval(() => {
+
+            index++
+
+            if (index >= cards.length) {
+                index = 0
+            }
+
+            const card = cards[index]
+
+            row.scrollTo({
+                left: card.offsetLeft - 12,
+                behavior: "smooth"
+            })
+
+        }, 3200)
+
+    })
+}
+
+window.addEventListener("load", startVoicesAutoSlider)

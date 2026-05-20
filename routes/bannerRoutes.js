@@ -17,8 +17,14 @@ const VALID_BANNER_TYPES = new Set([
     "homeUnisexSection",
     "homeCustomDesign",
     "menHero",
+    "menHero2",
+    "menHero3",
     "womenHero",
-    "unisexHero"
+    "womenHero2",
+    "womenHero3",
+    "unisexHero",
+    "unisexHero2",
+    "unisexHero3"
 ])
 
 // ===== HELPER =====

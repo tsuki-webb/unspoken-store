@@ -173,7 +173,7 @@
             dom.infoBanner.classList.remove("hidden")
             dom.infoBanner.innerHTML = `
                 Sign in to save your cart to your account and access it anytime.
-                <a href="index.html" style="margin-left:6px;font-weight:700;color:#2b2419;">Sign In</a>
+                <a href="index.html?signin=1" style="margin-left:6px;font-weight:700;color:#2b2419;">Sign In</a>
             `
             return
         }
