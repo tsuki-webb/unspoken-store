@@ -1684,8 +1684,8 @@ body.collection-page[data-collection="unisex"] {
     }
 
     .collection-main {
-        width: calc(100vw - 24px);
-        margin-top: 12px;
+        width: calc(100vw - 20px);
+        margin-top: 10px;
         margin-bottom: 30px;
     }
 
@@ -1693,7 +1693,7 @@ body.collection-page[data-collection="unisex"] {
         height: auto;
         min-height: 0;
         aspect-ratio: 16 / 9;
-        border-radius: 18px;
+        border-radius: 16px;
     }
 
     .collection-hero::after {
@@ -1776,7 +1776,7 @@ body.collection-page[data-collection="unisex"] {
     }
 
     .category-strip-wrap {
-        margin-top: 12px;
+        margin-top: 10px;
         padding: 12px;
     }
 
@@ -1828,7 +1828,7 @@ body.collection-page[data-collection="unisex"] {
     }
 
     .category-cards-wrap {
-        margin-top: 12px;
+        margin-top: 10px;
         padding: 12px;
     }
 
@@ -1857,17 +1857,19 @@ body.collection-page[data-collection="unisex"] {
         grid-template-columns: none;
         gap: 10px;
         overflow-x: auto;
-        padding-bottom: 2px;
+        padding: 1px 10px 2px 1px;
+        margin-right: -10px;
         scrollbar-width: none;
     }
 
     .category-preview-card {
         gap: 8px;
+        min-width: 0;
     }
 
     .category-preview-media {
         aspect-ratio: 4 / 3;
-        border-radius: 12px;
+        border-radius: 11px;
     }
 
     .category-preview-meta h3 {
@@ -1885,7 +1887,7 @@ body.collection-page[data-collection="unisex"] {
     }
 
     .sections-host {
-        margin-top: 12px;
+        margin-top: 10px;
         gap: 12px;
     }
 
@@ -1893,7 +1895,7 @@ body.collection-page[data-collection="unisex"] {
         flex-wrap: nowrap;
         align-items: flex-start;
         gap: 8px;
-        padding: 14px 12px 0;
+        padding: 14px 13px 0;
     }
 
     .section-head h2 {
@@ -1918,12 +1920,13 @@ body.collection-page[data-collection="unisex"] {
     }
 
     .section-subcategory-row {
-        padding: 10px 12px 0;
+        padding: 10px 13px 0;
     }
 
     .section-subcategory-chips {
         flex-wrap: nowrap;
         overflow-x: auto;
+        padding-right: 8px;
         scrollbar-width: none;
     }
 
@@ -1939,13 +1942,13 @@ body.collection-page[data-collection="unisex"] {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 9px;
         margin-top: 10px;
-        padding: 0 12px 12px;
+        padding: 0 13px 13px;
     }
 
     .product-card,
     .skeleton-card {
         min-width: 0;
-        border-radius: 13px;
+        border-radius: 12px;
     }
 
     .product-badges {
@@ -2043,14 +2046,14 @@ body.collection-page[data-collection="unisex"] {
         height: auto;
         min-height: 0;
         aspect-ratio: 16 / 9;
-        border-radius: 17px;
+        border-radius: 16px;
     }
 
     .products-grid,
     .skeleton-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 8px;
-        padding: 0 10px 10px;
+        padding: 0 12px 12px;
     }
 
     .product-info {

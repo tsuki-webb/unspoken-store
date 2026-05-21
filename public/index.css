@@ -2215,8 +2215,12 @@ img {
     .section-banner,
     .custom-studio-shell,
     .footer {
-        margin-top: 14px;
-        border-radius: 18px;
+        margin-top: 13px;
+        border-radius: 16px;
+    }
+
+    .section-banner {
+        border-radius: 14px;
     }
 
     .collection-banner {
