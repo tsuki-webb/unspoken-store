@@ -78,10 +78,10 @@
                 <span>Shipping</span>
                 <strong id="summaryShipping">&#8377; 0</strong>
             </div>
-            <!-- <div class="summary-row">
+            <div class="summary-row">
                 <span>Tax (5%)</span>
                 <strong id="summaryTax">&#8377; 0</strong>
-            </div> -->
+            </div>
             <div class="summary-total">
                 <span>Total</span>
                 <strong id="summaryGrandTotal">&#8377; 0</strong>
@@ -225,6 +225,19 @@
     </div>
 </section>
 
+<section class="payment-result-modal hidden" id="paymentResultModal" aria-hidden="true">
+    <div class="payment-result-card" role="dialog" aria-modal="true" aria-labelledby="paymentResultTitle">
+        <p class="payment-result-kicker" id="paymentResultKicker">PAYMENT STATUS</p>
+        <h2 id="paymentResultTitle">Order Status</h2>
+        <p id="paymentResultMessage">Your order status will appear here.</p>
+        <div class="payment-result-actions">
+            <button type="button" class="checkout-submit-btn" id="paymentResultPrimaryBtn">Continue Shopping</button>
+            <button type="button" class="ghost-btn" id="paymentResultSecondaryBtn">Close</button>
+        </div>
+    </div>
+</section>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="cart-core.js"></script>
 <script src="cart.js"></script>
 </body>

@@ -4,6 +4,7 @@ const mongoose = require("mongoose")
 
 const Banner = require("../models/Banner")
 const upload = require("../middleware/upload")
+const { requireAdminToken } = require("../middleware/adminAuth")
 const cloudinary = require("../config/cloudinary")
 const streamifier = require("streamifier")
 
@@ -61,7 +62,7 @@ router.get("/", async (req, res) => {
 })
 
 // ===== CREATE / UPDATE =====
-router.post("/", upload.single("image"), async (req, res) => {
+router.post("/", requireAdminToken, upload.single("image"), async (req, res) => {
     try {
         const locationType = normalizeText(req.body?.type)
         const requestedBannerId = normalizeText(req.body?.bannerId)
@@ -120,7 +121,7 @@ router.post("/", upload.single("image"), async (req, res) => {
 })
 
 // ===== DELETE =====
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", requireAdminToken, async (req, res) => {
     try {
         await Banner.findByIdAndDelete(req.params.id)
         res.json({ success: true })

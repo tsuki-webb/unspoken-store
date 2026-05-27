@@ -56,7 +56,14 @@
         checkoutCountry: document.getElementById("checkoutCountry"),
         checkoutLandmark: document.getElementById("checkoutLandmark"),
         checkoutNotes: document.getElementById("checkoutNotes"),
-        paymentMethods: document.getElementById("paymentMethods")
+        paymentMethods: document.getElementById("paymentMethods"),
+        paymentResultModal: document.getElementById("paymentResultModal"),
+        paymentResultCard: document.querySelector(".payment-result-card"),
+        paymentResultKicker: document.getElementById("paymentResultKicker"),
+        paymentResultTitle: document.getElementById("paymentResultTitle"),
+        paymentResultMessage: document.getElementById("paymentResultMessage"),
+        paymentResultPrimaryBtn: document.getElementById("paymentResultPrimaryBtn"),
+        paymentResultSecondaryBtn: document.getElementById("paymentResultSecondaryBtn")
     }
 
     function formatCurrency(value) {
@@ -130,6 +137,38 @@
         showToast._timer = setTimeout(() => {
             dom.toast.classList.remove("show")
         }, 2600)
+    }
+
+    function openPaymentResult({ tone = "success", title = "", message = "", primaryLabel = "Continue Shopping", secondaryLabel = "Close", onPrimary = null } = {}) {
+        if (!dom.paymentResultModal) return
+
+        dom.paymentResultCard?.classList.remove("success", "error")
+        dom.paymentResultCard?.classList.add(tone === "error" ? "error" : "success")
+        if (dom.paymentResultKicker) dom.paymentResultKicker.textContent = tone === "error" ? "PAYMENT FAILED" : "ORDER CONFIRMED"
+        if (dom.paymentResultTitle) dom.paymentResultTitle.textContent = title || (tone === "error" ? "Payment Failed" : "Order Confirmed")
+        if (dom.paymentResultMessage) dom.paymentResultMessage.textContent = message || ""
+        if (dom.paymentResultPrimaryBtn) {
+            dom.paymentResultPrimaryBtn.textContent = primaryLabel
+            dom.paymentResultPrimaryBtn.onclick = () => {
+                closePaymentResult()
+                if (typeof onPrimary === "function") {
+                    onPrimary()
+                }
+            }
+        }
+        if (dom.paymentResultSecondaryBtn) {
+            dom.paymentResultSecondaryBtn.textContent = secondaryLabel
+            dom.paymentResultSecondaryBtn.onclick = closePaymentResult
+        }
+
+        dom.paymentResultModal.classList.remove("hidden")
+        dom.paymentResultModal.setAttribute("aria-hidden", "false")
+    }
+
+    function closePaymentResult() {
+        if (!dom.paymentResultModal) return
+        dom.paymentResultModal.classList.add("hidden")
+        dom.paymentResultModal.setAttribute("aria-hidden", "true")
     }
 
     function setCheckoutFeedback(message, tone = "") {
@@ -536,7 +575,7 @@
         if (dom.checkoutSubmitBtn) {
             dom.checkoutSubmitBtn.textContent = method === "cod"
                 ? "Place Order"
-                : "Pay & Place Order"
+                : `Pay ${formatCurrency(state.cart?.grandTotal || 0)} Securely`
         }
 
         const subtitleParts = ["Fill your delivery details and choose a payment option."]
@@ -721,6 +760,92 @@
         return ""
     }
 
+    function loadRazorpayCheckout(paymentGateway, order) {
+        return new Promise((resolve, reject) => {
+            if (!window.Razorpay) {
+                reject(new Error("Razorpay checkout is not available. Please refresh and try again."))
+                return
+            }
+
+            if (!paymentGateway?.keyId || !paymentGateway?.orderId) {
+                reject(new Error("Payment gateway details are missing."))
+                return
+            }
+
+            const checkout = new window.Razorpay({
+                key: paymentGateway.keyId,
+                amount: paymentGateway.amount,
+                currency: paymentGateway.currency || "INR",
+                name: paymentGateway.name || "The Unspoken Store",
+                description: paymentGateway.description || `Order ${order?.orderCode || ""}`,
+                order_id: paymentGateway.orderId,
+                prefill: paymentGateway.prefill || {},
+                notes: {
+                    orderId: String(order?._id || ""),
+                    orderCode: String(order?.orderCode || "")
+                },
+                theme: {
+                    color: "#111111"
+                },
+                modal: {
+                    ondismiss: () => {
+                        reject(new Error("Payment window was closed before payment completed."))
+                    }
+                },
+                handler: response => {
+                    resolve(response || {})
+                }
+            })
+
+            checkout.on("payment.failed", response => {
+                const message =
+                    response?.error?.description ||
+                    response?.error?.reason ||
+                    "Payment failed. Please try again."
+                reject(new Error(message))
+            })
+
+            checkout.open()
+        })
+    }
+
+    async function confirmOnlinePayment({ order, razorpayResponse, userEmail }) {
+        const response = await fetch(`/api/orders/${encodeURIComponent(String(order?._id || ""))}/payment/confirm`, {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json",
+                ...(userEmail ? { "x-user-email": userEmail } : {})
+            },
+            body: JSON.stringify(razorpayResponse || {})
+        })
+
+        const payload = await response.json().catch(() => ({}))
+        if (!response.ok || !payload?.success) {
+            throw new Error(payload?.error || payload?.message || "Payment verification failed.")
+        }
+
+        return payload
+    }
+
+    async function markOnlinePaymentFailed({ order, reason, userEmail }) {
+        if (!order?._id) return
+
+        try {
+            await fetch(`/api/orders/${encodeURIComponent(String(order._id))}/payment/failed`, {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(userEmail ? { "x-user-email": userEmail } : {})
+                },
+                body: JSON.stringify({ reason: String(reason || "Payment was not completed.") })
+            })
+        } catch (err) {
+            console.log("Payment failure update error:", err)
+        }
+    }
+
     async function submitCheckout(event) {
         event.preventDefault()
         if (state.checkoutSubmitting) return
@@ -761,28 +886,87 @@
                 throw new Error(responsePayload?.error || responsePayload?.message || "Unable to place order right now")
             }
 
+            const orderCode = normalizeText(responsePayload?.order?.orderCode)
+            const paymentStatus = normalizeLower(responsePayload?.order?.payment?.status)
+            const isOnlinePayment = paymentStatus === "pending"
+
             saveCheckoutProfile(payload, payload?.payment?.method)
+
+            if (isOnlinePayment) {
+                setCheckoutFeedback("Opening secure payment window...", "success")
+
+                try {
+                    const razorpayResponse = await loadRazorpayCheckout(responsePayload?.paymentGateway, responsePayload?.order)
+                    setCheckoutFeedback("Verifying payment...", "success")
+
+                    const confirmationPayload = await confirmOnlinePayment({
+                        order: responsePayload?.order,
+                        razorpayResponse,
+                        userEmail
+                    })
+
+                    state.cart = confirmationPayload?.cart || responsePayload?.cart || state.cart
+                    closeCheckoutModal()
+                    setCheckoutFeedback("")
+                    openPaymentResult({
+                        tone: "success",
+                        title: "Payment Successful",
+                        message: orderCode
+                            ? `Order ${orderCode} is confirmed and paid.`
+                            : "Your order is confirmed and paid.",
+                        primaryLabel: "Continue Shopping",
+                        secondaryLabel: "Close",
+                        onPrimary: () => {
+                            window.location.href = "index.html"
+                        }
+                    })
+
+                    await loadRecommendations()
+                    syncUi()
+                    return
+                } catch (paymentErr) {
+                    await markOnlinePaymentFailed({
+                        order: responsePayload?.order,
+                        reason: paymentErr?.message,
+                        userEmail
+                    })
+
+                    setCheckoutFeedback(paymentErr?.message || "Payment was not completed.")
+                    openPaymentResult({
+                        tone: "error",
+                        title: "Payment Not Completed",
+                        message: "Your order was created, but payment was not verified. You can retry checkout from your cart.",
+                        primaryLabel: "Retry Payment",
+                        secondaryLabel: "Close",
+                        onPrimary: () => {
+                            openCheckoutModal()
+                        }
+                    })
+                    return
+                }
+            }
+
             try {
                 state.cart = await window.LuxoraCart.getCart()
             } catch (cartRefreshErr) {
                 state.cart = responsePayload?.cart || state.cart
             }
 
-            const orderCode = normalizeText(responsePayload?.order?.orderCode)
-            const paymentStatus = normalizeLower(responsePayload?.order?.payment?.status)
-
             closeCheckoutModal()
             setCheckoutFeedback("")
-
-            if (paymentStatus === "pending") {
-                showToast(orderCode
-                    ? `Order ${orderCode} placed. Complete payment securely.`
-                    : "Order placed. Complete payment securely.")
-            } else {
-                showToast(orderCode
-                    ? `Order placed: ${orderCode}`
-                    : "Order placed successfully")
-            }
+            openPaymentResult({
+                tone: "success",
+                title: "Order Placed",
+                message: orderCode
+                    ? `Order ${orderCode} is confirmed. Cash on delivery selected.`
+                    : "Your order is confirmed. Cash on delivery selected.",
+                primaryLabel: "Continue Shopping",
+                secondaryLabel: "Close",
+                onPrimary: () => {
+                    window.location.href = "index.html"
+                }
+            })
+            showToast(orderCode ? `Order placed: ${orderCode}` : "Order placed successfully")
 
             await loadRecommendations()
             syncUi()
@@ -821,12 +1005,21 @@
             }
         })
 
+        dom.paymentResultModal?.addEventListener("click", event => {
+            if (event.target === dom.paymentResultModal) {
+                closePaymentResult()
+            }
+        })
+
         dom.paymentMethods?.addEventListener("change", updatePaymentMethodUi)
         dom.checkoutForm?.addEventListener("submit", submitCheckout)
 
         window.addEventListener("keydown", event => {
             if (event.key === "Escape" && isCheckoutOpen()) {
                 closeCheckoutModal()
+            }
+            if (event.key === "Escape" && dom.paymentResultModal && !dom.paymentResultModal.classList.contains("hidden")) {
+                closePaymentResult()
             }
         })
 

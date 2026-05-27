@@ -5,6 +5,7 @@ const streamifier = require("streamifier")
 const CategoryCard = require("../models/CategoryCard")
 const upload = require("../middleware/upload")
 const cloudinary = require("../config/cloudinary")
+const { requireAdminToken } = require("../middleware/adminAuth")
 
 const router = express.Router()
 
@@ -132,7 +133,7 @@ router.get("/", async (req, res) => {
     }
 })
 
-router.post("/", upload.single("image"), async (req, res) => {
+router.post("/", requireAdminToken, upload.single("image"), async (req, res) => {
     try {
         const gender = normalizeText(req.body?.gender)
         const categoryId = normalizeText(req.body?.categoryId)
@@ -205,7 +206,7 @@ router.post("/", upload.single("image"), async (req, res) => {
     }
 })
 
-router.patch("/order", async (req, res) => {
+router.patch("/order", requireAdminToken, async (req, res) => {
     try {
         const gender = normalizeText(req.body?.gender)
         const orderedIdsRaw = Array.isArray(req.body?.orderedIds) ? req.body.orderedIds : []
@@ -256,7 +257,7 @@ router.patch("/order", async (req, res) => {
     }
 })
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", requireAdminToken, async (req, res) => {
     try {
         const id = normalizeId(req.params?.id)
 

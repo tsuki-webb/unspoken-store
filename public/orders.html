@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Orders | Unspoken Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand.css">
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="orders.css">
+</head>
+<body class="orders-page">
+<a class="skip-link" href="#mainContent">Skip to content</a>
+
+<header class="orders-nav">
+    <a class="orders-logo" href="index.html" aria-label="Unspoken Store home">
+        <img class="brand-logo" src="assets/logo/unspoken-store-logo.svg" alt="Store logo">
+    </a>
+
+    <nav aria-label="Primary navigation">
+        <a href="men.html">Men</a>
+        <a href="women.html">Women</a>
+        <a href="unisex.html">Unisex</a>
+        <a href="orders.html" aria-current="page">Orders</a>
+        <a href="cart.html" class="orders-cart-link" aria-label="Open cart">
+            Cart
+            <span class="cart-count-badge hidden" data-cart-count>0</span>
+        </a>
+    </nav>
+</header>
+
+<main id="mainContent" class="orders-shell">
+    <section class="orders-hero">
+        <div>
+            <p class="orders-kicker">ACCOUNT</p>
+            <h1>My Orders</h1>
+            <p id="ordersSubtitle">Track every order, payment, and delivery update in one place.</p>
+        </div>
+        <div class="orders-hero-actions">
+            <a href="cart.html">Open Cart</a>
+            <button type="button" id="refreshOrdersBtn">Refresh</button>
+        </div>
+    </section>
+
+    <section class="orders-stats" id="ordersStats" aria-label="Order summary"></section>
+
+    <section class="orders-tools" aria-label="Order filters">
+        <label>
+            <span>Search</span>
+            <input id="orderSearchInput" type="search" placeholder="Order code or product name" autocomplete="off">
+        </label>
+        <label>
+            <span>Status</span>
+            <select id="orderStatusFilter">
+                <option value="all">All orders</option>
+                <option value="placed">Placed</option>
+                <option value="processing">Processing</option>
+                <option value="shipped">Shipped</option>
+                <option value="delivered">Delivered</option>
+                <option value="cancelled">Cancelled</option>
+            </select>
+        </label>
+        <label>
+            <span>Payment</span>
+            <select id="paymentStatusFilter">
+                <option value="all">All payments</option>
+                <option value="paid">Paid</option>
+                <option value="pending">Pending</option>
+                <option value="cod-pending">COD pending</option>
+                <option value="failed">Failed</option>
+                <option value="refunded">Refunded</option>
+            </select>
+        </label>
+    </section>
+
+    <p class="orders-feedback" id="ordersFeedback" aria-live="polite"></p>
+    <section class="orders-list" id="ordersList" aria-label="Order list"></section>
+</main>
+
+<script src="cart-core.js"></script>
+<script src="orders.js"></script>
+</body>
+</html>

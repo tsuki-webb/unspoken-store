@@ -1,8 +1,9 @@
 const express = require("express")
 const router = express.Router()
 const User = require("../models/User")
+const { requireAdminToken } = require("../middleware/adminAuth")
 
-router.get("/", async (req, res) => {
+router.get("/", requireAdminToken, async (req, res) => {
     try {
         const users = await User.find().sort({ createdAt: -1 }).select("-password")
         res.json(users)
