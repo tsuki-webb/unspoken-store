@@ -51,6 +51,7 @@ const homeSearchBox = document.getElementById("homeSearchBox")
 const homeSearchInput = document.getElementById("homeSearchInput")
 const homeSearchResults = document.getElementById("homeSearchResults")
 const authOverlay = document.getElementById("authOverlay")
+const mobileNavQuery = window.matchMedia("(max-width: 760px)")
 let menuProductsCache = []
 let hasLoadedMenuProducts = false
 const STOREFRONT_ALLOWED_TYPES_BY_GENDER = {
@@ -574,6 +575,8 @@ function updateNavbarUserState(){
     const profileMenuName = document.getElementById("profileMenuName")
     const profileMenuEmail = document.getElementById("profileMenuEmail")
 
+    const showMobileProfile = mobileNavQuery.matches
+
     if(derivedName){
         if(signinBtn) signinBtn.style.display = "none"
         if(profileWrapper) profileWrapper.style.display = "flex"
@@ -592,15 +595,19 @@ function updateNavbarUserState(){
             profileMenuEmail.textContent = userEmail || "Signed in"
         }
     } else {
-        if(signinBtn) signinBtn.style.display = "inline-block"
-        if(profileWrapper) profileWrapper.style.display = "none"
+        if(signinBtn) signinBtn.style.display = showMobileProfile ? "none" : "inline-block"
+        if(profileWrapper) profileWrapper.style.display = showMobileProfile ? "flex" : "none"
+
+        if (profileCircle) {
+            profileCircle.textContent = "U"
+        }
 
         if (profileMenuName) {
             profileMenuName.textContent = "My Account"
         }
 
         if (profileMenuEmail) {
-            profileMenuEmail.textContent = "Guest"
+            profileMenuEmail.textContent = "Sign in to continue"
         }
     }
 }
@@ -675,6 +682,10 @@ window.closeProfileMenu = closeProfileMenu
 window.viewMyAccount = viewMyAccount
 window.logout = logout
 window.switchAccount = switchAccount
+
+if (typeof mobileNavQuery.addEventListener === "function") {
+    mobileNavQuery.addEventListener("change", updateNavbarUserState)
+}
 
 window.quickAddToCart = async function(productId, buttonEl) {
     if (!window.LuxoraCart?.addItem) return

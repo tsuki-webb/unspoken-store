@@ -2286,3 +2286,80 @@ body.collection-page[data-collection="unisex"] {
         border-radius: 12px;
     }
 }
+
+@media (max-width: 760px) {
+    .collection-hero {
+        aspect-ratio: 16 / 8.6;
+        min-height: 150px;
+        border-radius: 17px;
+    }
+
+    .collection-hero img {
+        object-position: center;
+        transform: none;
+    }
+
+    .collection-hero::before {
+        background: linear-gradient(180deg, rgba(8, 8, 8, 0.12) 0%, rgba(8, 8, 8, 0.35) 42%, rgba(8, 8, 8, 0.82) 100%);
+    }
+
+    .hero-content {
+        padding: 14px 13px 13px;
+        gap: 6px;
+    }
+
+    .hero-eyebrow {
+        font-size: 8.5px;
+        line-height: 1;
+        letter-spacing: 0.7px;
+    }
+
+    .hero-content h1 {
+        max-width: 12ch;
+        font-size: clamp(22px, 7vw, 30px);
+        line-height: 0.98;
+    }
+
+    .hero-content p {
+        max-width: 31ch;
+        font-size: 10.5px;
+        line-height: 1.35;
+    }
+
+    .hero-actions {
+        gap: 7px;
+    }
+
+    .hero-btn {
+        min-height: 29px;
+        padding: 0 10px;
+        font-size: 9px;
+    }
+
+    .collection-hero-dots {
+        right: 12px;
+        bottom: 10px;
+    }
+}
+
+@media (max-width: 420px) {
+    .collection-hero {
+        aspect-ratio: 16 / 8.9;
+        min-height: 142px;
+    }
+
+    .hero-content h1 {
+        font-size: clamp(20px, 6.8vw, 27px);
+    }
+
+    .hero-content p {
+        max-width: 28ch;
+        font-size: 9.8px;
+    }
+
+    .hero-btn {
+        min-height: 28px;
+        padding: 0 9px;
+        font-size: 8.5px;
+    }
+}

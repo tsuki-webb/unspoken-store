@@ -3337,3 +3337,231 @@ img {
         max-width: 86vw;
     }
 }
+
+@media (max-width: 760px) {
+    .account-area {
+        display: flex;
+    }
+
+    .profile-wrapper {
+        position: relative;
+        display: flex;
+    }
+
+    .profile-menu {
+        position: fixed;
+        top: 70px;
+        right: 10px;
+        left: 10px;
+        min-width: 0;
+        width: auto;
+        max-width: none;
+        border-radius: 18px;
+        padding: 10px;
+        box-shadow: 0 18px 44px rgba(19, 16, 11, 0.22);
+    }
+
+    .profile-menu button,
+    .profile-menu a {
+        min-height: 42px;
+        border-radius: 12px;
+        font-size: 13px;
+    }
+
+    .hero {
+        padding-top: 10px;
+    }
+
+    .slider {
+        aspect-ratio: 16 / 7;
+        min-height: 0;
+        border-radius: 18px;
+    }
+
+    .slide-content {
+        left: 14px;
+        right: 62px;
+        bottom: 13px;
+        gap: 6px;
+    }
+
+    .slide-content h1 {
+        max-width: 14ch;
+        font-size: clamp(22px, 7vw, 34px);
+        line-height: 0.98;
+    }
+
+    .slide-content p {
+        max-width: 34ch;
+        font-size: 10.5px;
+        line-height: 1.35;
+        -webkit-line-clamp: 2;
+    }
+
+    .hero-kicker {
+        min-height: 24px;
+        padding: 0 9px;
+        font-size: 8.5px;
+    }
+
+    .hero-buttons {
+        gap: 7px;
+    }
+
+    .hero-buttons a {
+        min-height: 30px;
+        padding: 0 11px;
+        font-size: 10px;
+    }
+
+    .dots {
+        right: 14px;
+        bottom: 12px;
+    }
+
+    .customer-voices {
+        overflow: hidden;
+    }
+
+    .voices-wrap {
+        gap: 12px;
+    }
+
+    .voices-row {
+        gap: 10px;
+        scroll-snap-type: x mandatory;
+        padding: 1px 0 8px;
+    }
+
+    .voice-card,
+    .thoughts-card,
+    .voice-card.featured-card,
+    .voice-card.tall-card,
+    .voice-card.wide-card,
+    .voice-card.compact-card,
+    .top-row .voice-card:not(.featured-card):not(.tall-card) {
+        flex: 0 0 100%;
+        min-width: 100%;
+        max-width: 100%;
+        min-height: 202px;
+        scroll-snap-align: start;
+    }
+}
+
+@media (max-width: 420px) {
+    .slider {
+        aspect-ratio: 16 / 7;
+        border-radius: 16px;
+    }
+
+    .slide-content {
+        left: 12px;
+        right: 52px;
+        bottom: 11px;
+    }
+
+    .slide-content h1 {
+        font-size: clamp(20px, 6.8vw, 30px);
+    }
+
+    .slide-content p {
+        font-size: 10px;
+    }
+
+    .hero-buttons a {
+        min-height: 28px;
+        padding: 0 10px;
+        font-size: 9.5px;
+    }
+}
+
+@media (max-width: 760px) {
+    .hero,
+    .section-banner {
+        width: calc(100vw - 16px);
+    }
+
+    .hero {
+        margin-inline: auto;
+    }
+
+    .slider {
+        aspect-ratio: 16 / 8.5;
+        min-height: 148px;
+        max-height: 190px;
+    }
+
+    .slide img {
+        object-position: center center;
+    }
+
+    .slide-content {
+        right: 16px;
+        bottom: 14px;
+        max-width: calc(100% - 28px);
+    }
+
+    .slide-content h1 {
+        max-width: 13ch;
+        font-size: clamp(23px, 7.4vw, 32px);
+    }
+
+    .slide-content p {
+        max-width: 30ch;
+        font-size: 10.5px;
+        line-height: 1.38;
+    }
+
+    .hero-buttons a {
+        min-height: 31px;
+        padding: 0 11px;
+    }
+
+    .section-banner {
+        aspect-ratio: 16 / 7;
+        height: auto;
+        padding: 0;
+        background: #efe5d7;
+    }
+
+    .section-banner img {
+        height: 100%;
+        object-fit: contain;
+        object-position: center;
+    }
+}
+
+@media (max-width: 420px) {
+    .hero,
+    .section-banner {
+        width: calc(100vw - 14px);
+    }
+
+    .hero {
+        margin-inline: auto;
+    }
+
+    .slider {
+        aspect-ratio: 16 / 8.7;
+        min-height: 142px;
+    }
+
+    .slide-content {
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+    }
+
+    .slide-content h1 {
+        font-size: clamp(21px, 7vw, 28px);
+    }
+
+    .slide-content p {
+        max-width: 28ch;
+        font-size: 9.8px;
+    }
+
+    .section-banner {
+        aspect-ratio: 16 / 5.4;
+    }
+}
