@@ -58,6 +58,7 @@ const STOREFRONT_ALLOWED_TYPES_BY_GENDER = {
     women: new Set(["tshirt", "top", "sweatpant"]),
     unisex: new Set(["tshirt"])
 }
+const mobilePreviewAutoScrollers = new WeakMap()
 
 function isStorefrontProductVisible(product) {
     const gender = String(product?.gender || "").trim().toLowerCase()
@@ -818,9 +819,109 @@ async function loadPreview(gender, containerId) {
            container.innerHTML += renderHomeProductCard(p)
         })
 
+        setupMobilePreviewAutoScroll(container)
+
     } catch (err) {
         console.log("Preview error:", err)
     }
+}
+
+function setupMobilePreviewAutoScroll(row) {
+    if (!row || mobilePreviewAutoScrollers.has(row)) return
+
+    const mobileQuery = window.matchMedia("(max-width: 760px)")
+    const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
+    let index = 0
+    let isPaused = false
+    let scrollSyncTimer = null
+
+    function cards() {
+        return Array.from(row.querySelectorAll(".product-card"))
+    }
+
+    function scrollToCard(card, behavior = "smooth") {
+        if (!card) return
+        row.scrollTo({
+            left: Math.max(0, card.offsetLeft - row.offsetLeft - 2),
+            behavior
+        })
+    }
+
+    function syncToNearestCard() {
+        const items = cards()
+        if (!items.length) return
+
+        const rowLeft = row.scrollLeft
+        let closestIndex = 0
+        let closestDistance = Number.POSITIVE_INFINITY
+
+        items.forEach((card, cardIndex) => {
+            const distance = Math.abs((card.offsetLeft - row.offsetLeft) - rowLeft)
+            if (distance < closestDistance) {
+                closestDistance = distance
+                closestIndex = cardIndex
+            }
+        })
+
+        index = closestIndex
+    }
+
+    const timer = window.setInterval(() => {
+        const items = cards()
+        if (
+            !mobileQuery.matches ||
+            reduceMotionQuery.matches ||
+            isPaused ||
+            items.length <= 2 ||
+            document.hidden
+        ) {
+            return
+        }
+
+        index = (index + 1) % items.length
+        scrollToCard(items[index])
+    }, 3600)
+
+    row.addEventListener("pointerdown", () => {
+        isPaused = true
+    })
+
+    row.addEventListener("pointerup", () => {
+        syncToNearestCard()
+        window.setTimeout(() => {
+            isPaused = false
+        }, 1600)
+    })
+
+    row.addEventListener("pointercancel", () => {
+        isPaused = false
+    })
+
+    row.addEventListener("focusin", () => {
+        isPaused = true
+    })
+
+    row.addEventListener("focusout", () => {
+        syncToNearestCard()
+        isPaused = false
+    })
+
+    row.addEventListener("scroll", () => {
+        if (!mobileQuery.matches) return
+        window.clearTimeout(scrollSyncTimer)
+        scrollSyncTimer = window.setTimeout(syncToNearestCard, 140)
+    }, { passive: true })
+
+    if (typeof mobileQuery.addEventListener === "function") {
+        mobileQuery.addEventListener("change", event => {
+            if (!event.matches) {
+                row.scrollTo({ left: 0, behavior: "auto" })
+                index = 0
+            }
+        })
+    }
+
+    mobilePreviewAutoScrollers.set(row, timer)
 }
 
 // ================= BANNERS =================

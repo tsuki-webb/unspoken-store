@@ -632,6 +632,11 @@ window.auth = auth
 const googleProvider = new GoogleAuthProvider()
 googleProvider.setCustomParameters({ prompt: "select_account" })
 
+function showFirebaseLoginProblem(message, error) {
+    console.error("Firebase Google login error:", error)
+    alert(message)
+}
+
 async function completeGoogleLogin(user) {
     if (!user?.email) {
         throw new Error("Google account email is required.")
@@ -639,7 +644,7 @@ async function completeGoogleLogin(user) {
 
     const response = await fetch("/api/auth/google", {
         method: "POST",
-        credentials: "same-origin",
+        credentials: "include",
         headers: {
             "Content-Type": "application/json"
         },
@@ -660,15 +665,13 @@ async function completeGoogleLogin(user) {
     }
 
     if (!response.ok || !payload?.success) {
-        if (payload?.message) {
-            throw new Error(payload.message)
-        }
+        const defaultMessage = response.status === 404
+            ? "Google auth API endpoint was not found on the server. Please deploy the latest backend code."
+            : `Unable to complete Google login (HTTP ${response.status}).`
 
-        if (response.status === 404) {
-            throw new Error("Google auth API is missing. Restart backend with latest server code.")
-        }
+        console.error("Google auth response error:", response.status, rawBody, payload)
 
-        throw new Error(`Unable to complete Google login (HTTP ${response.status})`)
+        throw new Error(payload?.message || defaultMessage)
     }
 
     if (payload?.user?.email) localStorage.setItem("userEmail", payload.user.email)
@@ -701,8 +704,8 @@ window.googleLogin = async function () {
                 await signInWithRedirect(auth, googleProvider)
                 return
             } catch (redirectErr) {
-                console.log("Google redirect login error:", redirectErr)
-                alert("Google login failed")
+                console.error("Google redirect login error:", redirectErr)
+                alert("Google login redirect failed. Please try again.")
                 return
             }
         }
@@ -712,16 +715,22 @@ window.googleLogin = async function () {
         }
 
         if (code === "auth/unauthorized-domain") {
-            alert("Google login is not enabled for this domain in Firebase Auth settings.")
+            showFirebaseLoginProblem(
+                "Google login is not enabled for this domain. Add the deployed site to Firebase Auth authorized domains.",
+                err
+            )
             return
         }
 
         if (code === "auth/operation-not-allowed") {
-            alert("Google provider is disabled in Firebase Authentication settings.")
+            showFirebaseLoginProblem(
+                "Google provider is disabled in Firebase Authentication settings.",
+                err
+            )
             return
         }
 
-        console.log("Google popup login error:", err)
+        console.error("Google popup login error:", err)
         alert(err?.message || "Google login failed")
     }
 }
@@ -732,7 +741,13 @@ window.googleLogin = async function () {
         if (!redirectResult?.user) return
         await completeGoogleLogin(redirectResult.user)
     } catch (err) {
-        console.log("Google redirect result error:", err)
+        console.error("Google redirect result error:", err)
+        if (String(err?.code || "") === "auth/unauthorized-domain") {
+            showFirebaseLoginProblem(
+                "Google login is not enabled for this domain. Add the deployed site to Firebase Auth authorized domains.",
+                err
+            )
+        }
     }
 })()
 </script>

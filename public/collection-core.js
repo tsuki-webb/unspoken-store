@@ -5,6 +5,7 @@
     const SEARCH_DEBOUNCE_MS = 220
     const SORT_KEYS = new Set(["newest", "price_asc", "price_desc", "featured", "new_collection"])
     const CATEGORY_CARD_PLACEHOLDER = "https://via.placeholder.com/900x1125?text=THE+UNSPOKEN+STORE"
+    const categoryCardAutoScrollers = new WeakMap()
     const STOREFRONT_ALLOWED_TYPES_BY_GENDER = {
         men: new Set(["tshirt", "shirt", "short", "sweatpant"]),
         women: new Set(["tshirt", "top", "sweatpant"]),
@@ -696,6 +697,106 @@
                     `
                 })
                 .join("")
+
+            setupCategoryCardsAutoScroll(dom.categoryCardsGrid)
+        }
+
+        function setupCategoryCardsAutoScroll(grid) {
+            if (!grid || categoryCardAutoScrollers.has(grid)) return
+
+            const mobileQuery = window.matchMedia("(max-width: 760px)")
+            const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
+            let index = 0
+            let isPaused = false
+            let scrollSyncTimer = null
+
+            function cards() {
+                return Array.from(grid.querySelectorAll(".category-preview-card"))
+            }
+
+            function scrollToCard(card, behavior = "smooth") {
+                if (!card) return
+                grid.scrollTo({
+                    left: Math.max(0, card.offsetLeft - grid.offsetLeft - 1),
+                    behavior
+                })
+            }
+
+            function syncToNearestCard() {
+                const items = cards()
+                if (!items.length) return
+
+                const currentLeft = grid.scrollLeft
+                let closestIndex = 0
+                let closestDistance = Number.POSITIVE_INFINITY
+
+                items.forEach((card, cardIndex) => {
+                    const distance = Math.abs((card.offsetLeft - grid.offsetLeft) - currentLeft)
+                    if (distance < closestDistance) {
+                        closestDistance = distance
+                        closestIndex = cardIndex
+                    }
+                })
+
+                index = closestIndex
+            }
+
+            window.setInterval(() => {
+                const items = cards()
+                if (
+                    !mobileQuery.matches ||
+                    reduceMotionQuery.matches ||
+                    isPaused ||
+                    items.length <= 2 ||
+                    document.hidden
+                ) {
+                    return
+                }
+
+                index = (index + 1) % items.length
+                scrollToCard(items[index])
+            }, 3800)
+
+            grid.addEventListener("pointerdown", () => {
+                isPaused = true
+            })
+
+            grid.addEventListener("pointerup", () => {
+                syncToNearestCard()
+                window.setTimeout(() => {
+                    isPaused = false
+                }, 1600)
+            })
+
+            grid.addEventListener("pointercancel", () => {
+                isPaused = false
+            })
+
+            grid.addEventListener("focusin", () => {
+                isPaused = true
+            })
+
+            grid.addEventListener("focusout", () => {
+                syncToNearestCard()
+                isPaused = false
+            })
+
+            grid.addEventListener("scroll", () => {
+                if (!mobileQuery.matches) return
+                window.clearTimeout(scrollSyncTimer)
+                scrollSyncTimer = window.setTimeout(syncToNearestCard, 140)
+            }, { passive: true })
+
+            if (typeof mobileQuery.addEventListener === "function") {
+                mobileQuery.addEventListener("change", event => {
+                    if (!event.matches) {
+                        grid.scrollTo({ left: 0, behavior: "auto" })
+                        index = 0
+                    }
+                })
+            }
+
+            categoryCardAutoScrollers.set(grid, true)
         }
 
         function renderSkeletons() {

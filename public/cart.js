@@ -37,6 +37,8 @@
         checkoutCancelBtn: document.getElementById("checkoutCancelBtn"),
         checkoutForm: document.getElementById("checkoutForm"),
         checkoutSubmitBtn: document.getElementById("checkoutSubmitBtn"),
+        payNowBtn: document.getElementById("payNowBtn"),
+        codBtn: document.getElementById("codBtn"),
         checkoutFeedback: document.getElementById("checkoutFeedback"),
         checkoutSubtitle: document.getElementById("checkoutSubtitle"),
         checkoutSummaryItems: document.getElementById("checkoutSummaryItems"),
@@ -579,25 +581,16 @@
     }
 
     function updatePaymentMethodUi() {
-        const method = getSelectedPaymentMethod()
-
-        dom.paymentMethods?.querySelectorAll(".payment-option").forEach(option => {
-            const radio = option.querySelector("input[name='paymentMethod']")
-            option.classList.toggle("active", normalizeLower(radio?.value) === method)
-        })
-
         if (dom.checkoutSubmitBtn) {
-            dom.checkoutSubmitBtn.textContent = method === "cod"
-                ? "Place Order"
-                : `Pay ${formatCurrency(state.cart?.grandTotal || 0)} Securely`
+            dom.checkoutSubmitBtn.textContent = `Place Order`
         }
 
-        const subtitleParts = ["Fill your delivery details and choose a payment option."]
-        if (method !== "cod") {
-            subtitleParts.push("Your payment details are entered only in a secure payment window.")
+        if (dom.payNowBtn) {
+            dom.payNowBtn.textContent = `Pay Now ${formatCurrency(state.cart?.grandTotal || 0)}`
         }
+
         if (dom.checkoutSubtitle) {
-            dom.checkoutSubtitle.textContent = subtitleParts.join(" ")
+            dom.checkoutSubtitle.textContent = "Fill your delivery details, then choose Pay Now or Cash on Delivery."
         }
     }
 
@@ -992,6 +985,122 @@
         }
     }
 
+    async function performCheckoutWithMethod(method) {
+        // force the selected payment method and submit
+        try {
+            // set the radio if present for backwards compatibility
+            setSelectedPaymentMethod(method)
+            // collect payload and override method
+            const payload = collectCheckoutPayload()
+            payload.payment = payload.payment || {}
+            payload.payment.method = method
+
+            const validationMessage = validateCheckoutPayload(payload)
+            if (validationMessage) {
+                setCheckoutFeedback(validationMessage)
+                return
+            }
+
+            // mimic form submission but call server with chosen method
+            setCheckoutBusy(true)
+            setCheckoutFeedback("Submitting your order...", "success")
+
+            let userEmail = window.LuxoraCart?.getUserEmail?.() || ""
+            if (!userEmail && window.LuxoraCart?.ensureSignedIn) {
+                try {
+                    userEmail = await window.LuxoraCart.ensureSignedIn()
+                } catch (err) {
+                    setCheckoutFeedback("Sign in before placing your order.")
+                    setCheckoutBusy(false)
+                    return
+                }
+            }
+
+            const response = await fetch("/api/orders/checkout", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(userEmail ? { "x-user-email": userEmail } : {})
+                },
+                body: JSON.stringify(payload)
+            })
+
+            const responsePayload = await response.json().catch(() => ({}))
+            if (!response.ok || !responsePayload?.success) {
+                throw new Error(responsePayload?.error || responsePayload?.message || "Unable to place order right now")
+            }
+
+            const order = responsePayload?.order || {}
+            const paymentStatus = normalizeLower(order?.payment?.status)
+            const isOnlinePayment = paymentStatus === "pending" || normalizeLower(method) !== "cod"
+
+            saveCheckoutProfile(payload, payload?.payment?.method)
+
+            if (isOnlinePayment) {
+                setCheckoutFeedback("Opening secure payment window...", "success")
+                try {
+                    const razorpayResponse = await loadRazorpayCheckout(responsePayload?.paymentGateway, order)
+                    setCheckoutFeedback("Verifying payment...", "success")
+
+                    const confirmationPayload = await confirmOnlinePayment({ order, razorpayResponse, userEmail })
+
+                    state.cart = confirmationPayload?.cart || responsePayload?.cart || state.cart
+                    closeCheckoutModal()
+                    setCheckoutFeedback("")
+                    openPaymentResult({
+                        tone: "success",
+                        title: "Payment Successful",
+                        message: order?.orderCode ? `Order ${order.orderCode} is confirmed and paid.` : "Your order is confirmed and paid.",
+                        primaryLabel: "Continue Shopping",
+                        onPrimary: () => window.location.href = "index.html"
+                    })
+                    await loadRecommendations()
+                    syncUi()
+                    return
+                } catch (paymentErr) {
+                    await markOnlinePaymentFailed({ order, reason: paymentErr?.message, userEmail })
+                    setCheckoutFeedback(paymentErr?.message || "Payment was not completed.")
+                    openPaymentResult({
+                        tone: "error",
+                        title: "Payment Not Completed",
+                        message: "Your order was created, but payment was not verified. You can retry checkout from your cart.",
+                        primaryLabel: "Retry Payment",
+                        onPrimary: () => openCheckoutModal()
+                    })
+                    return
+                }
+            }
+
+            // COD path
+            try {
+                state.cart = await window.LuxoraCart.getCart()
+            } catch (cartRefreshErr) {
+                state.cart = responsePayload?.cart || state.cart
+            }
+
+            closeCheckoutModal()
+            setCheckoutFeedback("")
+            openPaymentResult({
+                tone: "success",
+                title: "Order Placed",
+                message: order?.orderCode ? `Order ${order.orderCode} is confirmed. Cash on delivery selected.` : "Your order is confirmed. Cash on delivery selected.",
+                primaryLabel: "Continue Shopping",
+                onPrimary: () => window.location.href = "index.html"
+            })
+
+            showToast(order?.orderCode ? `Order placed: ${order.orderCode}` : "Order placed successfully")
+
+            await loadRecommendations()
+            syncUi()
+        } catch (err) {
+            console.log("Checkout perform error:", err)
+            setCheckoutFeedback(err?.message || "Unable to place order right now.")
+        } finally {
+            setCheckoutBusy(false)
+        }
+    }
+
     function bindEvents() {
         dom.cartList?.addEventListener("click", handleCartListClick)
         dom.cartList?.addEventListener("change", handleSizeChange)
@@ -1008,6 +1117,22 @@
 
         dom.checkoutBtn?.addEventListener("click", () => {
             beginCheckout()
+        })
+
+        dom.payNowBtn?.addEventListener("click", () => {
+            // Open checkout modal then trigger Pay Now flow
+            beginCheckout().then(() => {
+                // ensure form prefills and UI updated
+                updatePaymentMethodUi()
+                performCheckoutWithMethod("card")
+            })
+        })
+
+        dom.codBtn?.addEventListener("click", () => {
+            beginCheckout().then(() => {
+                updatePaymentMethodUi()
+                performCheckoutWithMethod("cod")
+            })
         })
 
         dom.checkoutCloseBtn?.addEventListener("click", closeCheckoutModal)
