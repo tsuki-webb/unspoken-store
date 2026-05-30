@@ -263,6 +263,12 @@ img {
     border-radius: 12px;
 }
 
+.home-page.auth-pending .signin-btn,
+.home-page.auth-pending .profile-wrapper {
+    opacity: 0;
+    pointer-events: none;
+}
+
 .signin-btn {
     padding: 0 16px;
     background: linear-gradient(135deg, #111 0%, #28221b 100%);
@@ -3532,10 +3538,10 @@ img {
     }
 }
 
-@media (max-width: 420px) {
+@media (max-width: 450px) {
     .hero,
     .section-banner {
-        width: calc(100vw - 14px);
+        width: calc(100vw - 36px);
     }
 
     .hero {

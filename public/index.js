@@ -610,6 +610,10 @@ function updateNavbarUserState(){
             profileMenuEmail.textContent = "Sign in to continue"
         }
     }
+
+    if (document.body?.classList.contains("auth-pending")) {
+        document.body.classList.remove("auth-pending")
+    }
 }
 
 function closeProfileMenu(){
