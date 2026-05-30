@@ -2100,6 +2100,7 @@ img {
     .custom-studio-section,
     .footer {
         width: calc(100vw - 24px);
+        margin: 0 auto;
     }
 
     .slider {
