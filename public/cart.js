@@ -71,6 +71,16 @@
         return `${INR_SYMBOL} ${number.toLocaleString("en-IN", { maximumFractionDigits: 2 })}`
     }
 
+    function setText(node, value) {
+        if (!node) return
+        node.textContent = String(value || "")
+    }
+
+    function setHtml(node, value) {
+        if (!node) return
+        node.innerHTML = String(value || "")
+    }
+
     function escapeHtml(value) {
         return String(value || "")
             .replace(/&/g, "&amp;")
@@ -130,7 +140,7 @@
 
     function showToast(message) {
         if (!dom.toast) return
-        dom.toast.textContent = message
+        setText(dom.toast, message)
         dom.toast.classList.add("show")
 
         clearTimeout(showToast._timer)
@@ -173,16 +183,16 @@
 
     function setCheckoutFeedback(message, tone = "") {
         if (!dom.checkoutFeedback) return
-        dom.checkoutFeedback.textContent = message
+        setText(dom.checkoutFeedback, message)
         dom.checkoutFeedback.className = `checkout-feedback ${tone}`.trim()
     }
 
     function renderSummary(cart) {
-        dom.summaryItems.textContent = String(cart?.itemCount || 0)
-        dom.summarySubtotal.textContent = formatCurrency(cart?.subtotal || 0)
-        dom.summaryShipping.textContent = formatCurrency(cart?.shipping || 0)
-        dom.summaryTax.textContent = formatCurrency(cart?.tax || 0)
-        dom.summaryGrandTotal.textContent = formatCurrency(cart?.grandTotal || 0)
+        setText(dom.summaryItems, String(cart?.itemCount || 0))
+        setText(dom.summarySubtotal, formatCurrency(cart?.subtotal || 0))
+        setText(dom.summaryShipping, formatCurrency(cart?.shipping || 0))
+        setText(dom.summaryTax, formatCurrency(cart?.tax || 0))
+        setText(dom.summaryGrandTotal, formatCurrency(cart?.grandTotal || 0))
 
         const freeThreshold = Number(cart?.freeShippingThreshold || 1999)
         const subtotal = Number(cart?.subtotal || 0)
@@ -197,11 +207,11 @@
         }
 
         if (!cart?.itemCount) {
-            dom.shippingHint.textContent = "Add products to unlock free shipping."
+            setText(dom.shippingHint, "Add products to unlock free shipping.")
         } else if (remaining <= 0) {
-            dom.shippingHint.textContent = "Free shipping unlocked for this cart."
+            setText(dom.shippingHint, "Free shipping unlocked for this cart.")
         } else {
-            dom.shippingHint.textContent = `${formatCurrency(remaining)} away from free shipping.`
+            setText(dom.shippingHint, `${formatCurrency(remaining)} away from free shipping.`)
         }
     }
 
@@ -221,16 +231,18 @@
         const taxRateLabel = Math.round(TAX_RATE * 100)
 
         dom.infoBanner.classList.remove("hidden")
-        dom.infoBanner.innerHTML = itemCount
+        setHtml(dom.infoBanner, itemCount
             ? `Cart synced for <b>${escapeHtml(userEmail)}</b>. Taxes are estimated at ${taxRateLabel}% until checkout.`
-            : `Your cart is saved for <b>${escapeHtml(userEmail)}</b>. Start adding your favorite products.`
+            : `Your cart is saved for <b>${escapeHtml(userEmail)}</b>. Start adding your favorite products.`)
     }
 
     function renderEmptyState(show) {
+        if (!dom.emptyState) return
         dom.emptyState.classList.toggle("hidden", !show)
     }
 
     function renderCartList(cart) {
+        if (!dom.cartList) return
         const items = Array.isArray(cart?.items) ? cart.items : []
 
         if (!items.length) {
@@ -324,11 +336,11 @@
             }
         }
 
-        if (dom.checkoutReviewItems) dom.checkoutReviewItems.textContent = String(state.cart?.itemCount || 0)
-        if (dom.checkoutReviewSubtotal) dom.checkoutReviewSubtotal.textContent = formatCurrency(state.cart?.subtotal || 0)
-        if (dom.checkoutReviewShipping) dom.checkoutReviewShipping.textContent = formatCurrency(state.cart?.shipping || 0)
-        if (dom.checkoutReviewTax) dom.checkoutReviewTax.textContent = formatCurrency(state.cart?.tax || 0)
-        if (dom.checkoutReviewTotal) dom.checkoutReviewTotal.textContent = formatCurrency(state.cart?.grandTotal || 0)
+        if (dom.checkoutReviewItems) setText(dom.checkoutReviewItems, String(state.cart?.itemCount || 0))
+        if (dom.checkoutReviewSubtotal) setText(dom.checkoutReviewSubtotal, formatCurrency(state.cart?.subtotal || 0))
+        if (dom.checkoutReviewShipping) setText(dom.checkoutReviewShipping, formatCurrency(state.cart?.shipping || 0))
+        if (dom.checkoutReviewTax) setText(dom.checkoutReviewTax, formatCurrency(state.cart?.tax || 0))
+        if (dom.checkoutReviewTotal) setText(dom.checkoutReviewTotal, formatCurrency(state.cart?.grandTotal || 0))
     }
 
     function syncUi() {
@@ -336,12 +348,14 @@
         const userEmail = window.LuxoraCart?.getUserEmail?.() || ""
         const itemCount = Number(cart.itemCount || 0)
 
-        dom.subhead.textContent = userEmail
-            ? `${itemCount} item${itemCount === 1 ? "" : "s"} saved in your cart`
-            : "Sign in to keep a cart unique to your account"
+        if (dom.subhead) {
+            dom.subhead.textContent = userEmail
+                ? `${itemCount} item${itemCount === 1 ? "" : "s"} saved in your cart`
+                : "Sign in to keep a cart unique to your account"
+        }
 
-        dom.clearCartBtn.classList.toggle("hidden", !itemCount)
-        dom.checkoutBtn.disabled = !itemCount
+        if (dom.clearCartBtn) dom.clearCartBtn.classList.toggle("hidden", !itemCount)
+        if (dom.checkoutBtn) dom.checkoutBtn.disabled = !itemCount
         renderBanner(cart, userEmail)
         renderSummary(cart)
         renderCartList(cart)
@@ -350,8 +364,8 @@
     }
 
     function setButtonsDisabled(isDisabled) {
-        dom.clearCartBtn.disabled = isDisabled
-        dom.checkoutBtn.disabled = isDisabled || !(state.cart?.itemCount > 0)
+        if (dom.clearCartBtn) dom.clearCartBtn.disabled = isDisabled
+        if (dom.checkoutBtn) dom.checkoutBtn.disabled = isDisabled || !(state.cart?.itemCount > 0)
     }
 
     async function loadCheckoutOptions() {

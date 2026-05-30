@@ -371,7 +371,7 @@ async function ensureCart(userEmail) {
 }
 
 async function requireUserEmail(req, res) {
-    const auth = await resolveAuthenticatedUser(req)
+    const auth = await resolveAuthenticatedUser(req, { allowFallback: true })
     const userEmail = String(auth?.email || "")
 
     if (!userEmail) {
