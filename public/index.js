@@ -47,17 +47,84 @@ const menuToggleBtn = document.getElementById("menuToggleBtn")
 const menuSearchInput = document.getElementById("menuSearchInput")
 const menuSearchBtn = document.getElementById("menuSearchBtn")
 const menuSearchResults = document.getElementById("menuSearchResults")
+const menuSearch = document.querySelector(".menu-search")
+const menuFooterContact = document.getElementById("menuFooterContact")
+const menuDynamicContent = document.getElementById("menuDynamicContent")
 const homeSearchBox = document.getElementById("homeSearchBox")
 const homeSearchInput = document.getElementById("homeSearchInput")
 const homeSearchResults = document.getElementById("homeSearchResults")
 const authOverlay = document.getElementById("authOverlay")
 const mobileNavQuery = window.matchMedia("(max-width: 760px)")
 let menuProductsCache = []
+let menuCategoryCardsCache = []
 let hasLoadedMenuProducts = false
+let hasRenderedMenuSections = false
 const STOREFRONT_ALLOWED_TYPES_BY_GENDER = {
     men: new Set(["tshirt", "shirt", "short", "sweatpant"]),
     women: new Set(["tshirt", "top", "sweatpant"]),
     unisex: new Set(["tshirt"])
+}
+const MENU_IMAGE_PLACEHOLDER = "https://via.placeholder.com/700x875?text=UNSPOKEN"
+const MENU_COLLECTIONS = {
+    men: {
+        label: "Men",
+        page: "men.html",
+        headline: "Men's streetwear essentials",
+        summary: "Oversized tees, sharp shirts, relaxed shorts, and sweatpants built for everyday movement.",
+        categories: [
+            {
+                id: "tshirts",
+                label: "T-Shirts",
+                type: "tshirt",
+                summary: "Core graphics and clean everyday fits.",
+                subcategories: [
+                    { label: "Oversized Fit", href: "men.html?fit=oversized#tshirts", fit: "oversized" },
+                    { label: "Regular Fit", href: "men.html?fit=regular#tshirts", fit: "regular" }
+                ]
+            },
+            { id: "shirts", label: "Shirts", type: "shirt", summary: "Layering pieces with a polished streetwear edge." },
+            { id: "shorts", label: "Shorts", type: "short", summary: "Comfort-focused bottoms for off-duty styling." },
+            { id: "sweatpants", label: "Sweatpants", type: "sweatpant", summary: "Soft utility for travel, lounges, and daily wear." }
+        ]
+    },
+    women: {
+        label: "Women",
+        page: "women.html",
+        headline: "Women's refined streetwear",
+        summary: "Soft structure, expressive tees, elevated tops, and comfort bottoms in a cleaner edit.",
+        categories: [
+            {
+                id: "tshirts",
+                label: "T-Shirts",
+                type: "tshirt",
+                summary: "Graphic and essential tees across two fits.",
+                subcategories: [
+                    { label: "Oversized Fit", href: "women.html?fit=oversized#tshirts", fit: "oversized" },
+                    { label: "Regular Fit", href: "women.html?fit=regular#tshirts", fit: "regular" }
+                ]
+            },
+            { id: "tops", label: "Tops", type: "top", summary: "Polished essentials with effortless shape." },
+            { id: "sweatpants", label: "Sweatpants", type: "sweatpant", summary: "Comfort pieces with clean everyday styling." }
+        ]
+    },
+    unisex: {
+        label: "Unisex",
+        page: "unisex.html",
+        headline: "Universal T-Shirt fits",
+        summary: "Balanced silhouettes for shared wardrobes, clean graphics, and easy daily styling.",
+        categories: [
+            {
+                id: "tshirts",
+                label: "T-Shirts",
+                type: "tshirt",
+                summary: "Universal tees in oversized and regular fits.",
+                subcategories: [
+                    { label: "Oversized Fit", href: "unisex.html?fit=oversized#tshirts", fit: "oversized" },
+                    { label: "Regular Fit", href: "unisex.html?fit=regular#tshirts", fit: "regular" }
+                ]
+            }
+        ]
+    }
 }
 const mobilePreviewAutoScrollers = new WeakMap()
 
@@ -258,6 +325,227 @@ async function ensureMenuProductsLoaded() {
     }
 }
 
+async function ensureMenuCategoryCardsLoaded() {
+    if (Array.isArray(menuCategoryCardsCache) && menuCategoryCardsCache.length) return
+
+    try {
+        const response = await fetch("/api/category-cards")
+        const cards = await response.json()
+        menuCategoryCardsCache = Array.isArray(cards) ? cards : []
+    } catch (err) {
+        console.log("Menu category card load error:", err)
+        menuCategoryCardsCache = []
+    }
+}
+
+async function ensureMenuAssetsLoaded() {
+    await Promise.all([
+        ensureMenuProductsLoaded(),
+        ensureMenuCategoryCardsLoaded()
+    ])
+    renderStoreMenuSections()
+}
+
+function getMenuProductsForCategory(gender, category, limit = 6) {
+    return menuProductsCache
+        .filter(product => {
+            if (String(product?.gender || "").toLowerCase() !== gender) return false
+            if (String(product?.type || "").toLowerCase() !== category.type) return false
+            return true
+        })
+        .sort((a, b) => {
+            const flagDiff = Number(isEnabledFlag(b?.newCollection)) - Number(isEnabledFlag(a?.newCollection))
+            if (flagDiff !== 0) return flagDiff
+            return new Date(b?.createdAt || 0) - new Date(a?.createdAt || 0)
+        })
+        .slice(0, limit)
+}
+
+function getMenuProductsForCollection(gender, limit = 4) {
+    return menuProductsCache
+        .filter(product => String(product?.gender || "").toLowerCase() === gender)
+        .sort((a, b) => {
+            const featuredDiff = Number(isEnabledFlag(b?.featured)) - Number(isEnabledFlag(a?.featured))
+            if (featuredDiff !== 0) return featuredDiff
+            const newDiff = Number(isEnabledFlag(b?.newCollection)) - Number(isEnabledFlag(a?.newCollection))
+            if (newDiff !== 0) return newDiff
+            return new Date(b?.createdAt || 0) - new Date(a?.createdAt || 0)
+        })
+        .slice(0, limit)
+}
+
+function findMenuCategoryCard(gender, categoryId) {
+    return menuCategoryCardsCache.find(card => {
+        return String(card?.gender || "").toLowerCase() === gender &&
+            String(card?.categoryId || "").toLowerCase() === categoryId
+    })
+}
+
+function getMenuCategoryImage(gender, category) {
+    const categoryCard = findMenuCategoryCard(gender, category.id)
+    if (categoryCard?.image) return categoryCard.image
+
+    const product = getMenuProductsForCategory(gender, category, 1)[0]
+    return product?.images?.[0] || product?.image || MENU_IMAGE_PLACEHOLDER
+}
+
+function getMenuProductImage(product) {
+    return product?.images?.[0] || product?.image || MENU_IMAGE_PLACEHOLDER
+}
+
+function getCategoryHref(genderConfig, category) {
+    return `${genderConfig.page}#${encodeURIComponent(category.id)}`
+}
+
+function renderMenuCategoryTiles(gender, genderConfig) {
+    return genderConfig.categories.map(category => {
+        const products = getMenuProductsForCategory(gender, category, 8)
+        const categoryCard = findMenuCategoryCard(gender, category.id)
+        const image = getMenuCategoryImage(gender, category)
+        const title = categoryCard?.title || category.label
+        const subtitle = categoryCard?.subtitle || category.summary
+        const countLabel = products.length
+            ? `${products.length} item${products.length === 1 ? "" : "s"}`
+            : "Explore"
+
+        return `
+            <a class="menu-category-card" href="${escapeHtml(getCategoryHref(genderConfig, category))}">
+                <span class="menu-category-media">
+                    <img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" loading="lazy" decoding="async">
+                </span>
+                <span class="menu-category-copy">
+                    <strong>${escapeHtml(title)}</strong>
+                    <small>${escapeHtml(subtitle)}</small>
+                    <em>${escapeHtml(countLabel)}</em>
+                </span>
+            </a>
+        `
+    }).join("")
+}
+
+function renderMenuFitLinks(category) {
+    if (!Array.isArray(category.subcategories) || !category.subcategories.length) return ""
+
+    return `
+        <div class="menu-fit-links">
+            ${category.subcategories.map(subcategory => `
+                <a href="${escapeHtml(subcategory.href)}">${escapeHtml(subcategory.label)}</a>
+            `).join("")}
+        </div>
+    `
+}
+
+function renderMenuAccordions(gender, genderConfig) {
+    return genderConfig.categories.map((category, index) => {
+        const products = getMenuProductsForCategory(gender, category, 3)
+        const isOpen = index === 0 ? " open" : ""
+
+        return `
+            <details class="menu-accordion"${isOpen}>
+                <summary>
+                    <span>${escapeHtml(category.label)}</span>
+                    <small>${escapeHtml(category.summary)}</small>
+                </summary>
+                ${renderMenuFitLinks(category)}
+                <div class="menu-mini-products">
+                    ${products.length ? products.map(product => `
+                        <a class="menu-mini-product" href="product.html?id=${encodeURIComponent(String(product._id || ""))}">
+                            <img src="${escapeHtml(getMenuProductImage(product))}" alt="${escapeHtml(product.name)}" loading="lazy" decoding="async">
+                            <span>
+                                <strong>${escapeHtml(product.name)}</strong>
+                                <small>${escapeHtml(formatMenuProductType(product))}</small>
+                            </span>
+                        </a>
+                    `).join("") : `
+                        <a class="menu-mini-product empty" href="${escapeHtml(getCategoryHref(genderConfig, category))}">
+                            <span>
+                                <strong>Browse ${escapeHtml(category.label)}</strong>
+                                <small>Open the full section to see available pieces.</small>
+                            </span>
+                        </a>
+                    `}
+                </div>
+            </details>
+        `
+    }).join("")
+}
+
+function renderMenuSpotlight(gender, genderConfig) {
+    const products = getMenuProductsForCollection(gender, 4)
+
+    if (!products.length) {
+        return `
+            <a class="menu-hero-card" href="${escapeHtml(genderConfig.page)}">
+                <span class="menu-hero-copy">
+                    <small>${escapeHtml(genderConfig.label)} Edit</small>
+                    <strong>${escapeHtml(genderConfig.headline)}</strong>
+                    <em>${escapeHtml(genderConfig.summary)}</em>
+                </span>
+            </a>
+        `
+    }
+
+    const mainProduct = products[0]
+
+    return `
+        <a class="menu-hero-card has-image" href="${escapeHtml(genderConfig.page)}">
+            <img src="${escapeHtml(getMenuProductImage(mainProduct))}" alt="${escapeHtml(mainProduct.name)}" loading="lazy" decoding="async">
+            <span class="menu-hero-copy">
+                <small>${escapeHtml(genderConfig.label)} Edit</small>
+                <strong>${escapeHtml(genderConfig.headline)}</strong>
+                <em>${escapeHtml(genderConfig.summary)}</em>
+            </span>
+        </a>
+        <div class="menu-product-strip" aria-label="${escapeHtml(genderConfig.label)} featured products">
+            ${products.map(product => `
+                <a href="product.html?id=${encodeURIComponent(String(product._id || ""))}">
+                    <img src="${escapeHtml(getMenuProductImage(product))}" alt="${escapeHtml(product.name)}" loading="lazy" decoding="async">
+                    <span>${escapeHtml(product.name)}</span>
+                </a>
+            `).join("")}
+        </div>
+    `
+}
+
+function renderStoreMenuSections() {
+    Object.entries(MENU_COLLECTIONS).forEach(([gender, genderConfig]) => {
+        const panel = document.getElementById(gender)
+        if (!panel) return
+
+        panel.innerHTML = `
+            <div class="menu-section-stack">
+                ${renderMenuSpotlight(gender, genderConfig)}
+
+                <section class="menu-visual-section" aria-label="${escapeHtml(genderConfig.label)} categories">
+                    <div class="menu-section-head">
+                        <span>Shop by category</span>
+                        <a href="${escapeHtml(genderConfig.page)}">View all</a>
+                    </div>
+                    <div class="menu-category-grid">
+                        ${renderMenuCategoryTiles(gender, genderConfig)}
+                    </div>
+                </section>
+
+                <section class="menu-visual-section" aria-label="${escapeHtml(genderConfig.label)} quick links">
+                    <div class="menu-section-head">
+                        <span>Refine the edit</span>
+                    </div>
+                    <div class="menu-accordion-stack">
+                        ${renderMenuAccordions(gender, genderConfig)}
+                    </div>
+                </section>
+
+                <div class="menu-service-links">
+                    <a href="custom-design.html">Custom T-Shirt Studio</a>
+                    <a href="index.html#featuredProducts">New Collection</a>
+                </div>
+            </div>
+        `
+    })
+
+    hasRenderedMenuSections = true
+}
+
 function initializeMenuInteractions() {
     if (menuSearchInput) {
         menuSearchInput.addEventListener("input", async () => {
@@ -283,6 +571,31 @@ function initializeMenuInteractions() {
             await ensureMenuProductsLoaded()
             renderMenuSearchResults(menuSearchInput?.value || "")
             menuSearchInput?.focus()
+        })
+    }
+
+    if (menuDynamicContent) {
+        let menuLastScrollTop = 0
+
+        menuDynamicContent.addEventListener("scroll", () => {
+            const scrollTop = menuDynamicContent.scrollTop
+            const scrollHeight = menuDynamicContent.scrollHeight
+            const clientHeight = menuDynamicContent.clientHeight
+
+            if (menuSearch) {
+                if (scrollTop > menuLastScrollTop + 6) {
+                    menuSearch.classList.add("menu-search-hidden")
+                } else if (scrollTop < menuLastScrollTop - 6 || scrollTop <= 10) {
+                    menuSearch.classList.remove("menu-search-hidden")
+                }
+            }
+
+            const atBottom = scrollTop + clientHeight >= scrollHeight - 6
+            if (menuFooterContact) {
+                menuFooterContact.classList.toggle("active", atBottom)
+            }
+
+            menuLastScrollTop = scrollTop
         })
     }
 
@@ -344,6 +657,15 @@ async function toggleMenu(forceOpen){
     if (open) {
         closeProfileMenu()
         closeHomeSearchResults()
+
+        if (menuSearch) {
+            menuSearch.classList.remove("menu-search-hidden")
+        }
+
+        if (menuFooterContact && menuDynamicContent) {
+            const atBottom = menuDynamicContent.scrollTop + menuDynamicContent.clientHeight >= menuDynamicContent.scrollHeight - 6
+            menuFooterContact.classList.toggle("active", atBottom)
+        }
     }
 
     updateMenuUiState(open)
@@ -356,7 +678,7 @@ async function toggleMenu(forceOpen){
         renderMenuSearchResults("")
     }
 
-    await ensureMenuProductsLoaded()
+    await ensureMenuAssetsLoaded()
 
     if (menuSearchInput) {
         renderMenuSearchResults(menuSearchInput.value)
@@ -400,6 +722,10 @@ window.googleLogin = window.googleLogin || function () {
 
 // ================= MENU TABS =================
 function switchTab(tabId, clickEvent){
+    if (!hasRenderedMenuSections) {
+        ensureMenuAssetsLoaded()
+    }
+
     document.querySelectorAll(".tab").forEach(btn => btn.classList.remove("active"))
     document.querySelectorAll(".menu-content").forEach(c => c.classList.remove("active"))
 

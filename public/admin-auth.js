@@ -37,14 +37,11 @@
     }
 
     function requestToken() {
-        const token = window.prompt("Enter admin token")
-        if (!normalizeText(token)) return ""
-        saveToken(token)
-        return normalizeText(token)
+        return ""
     }
 
     function getToken() {
-        return readToken() || requestToken()
+        return readToken()
     }
 
     function mergeAdminHeaders(init = {}, token = "") {
@@ -72,10 +69,7 @@
         }
 
         clearToken()
-        const nextToken = requestToken()
-        if (!nextToken) return response
-
-        return nativeFetch(input, mergeAdminHeaders(init, nextToken))
+        return response
     }
 
     window.LuxoraAdminAuth = {

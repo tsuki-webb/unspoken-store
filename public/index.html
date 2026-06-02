@@ -88,9 +88,12 @@
 <aside class="full-menu" id="sideMenu" aria-hidden="true">
     <div class="menu-shell">
         <div class="menu-top">
-            <span class="menu-logo" aria-label="Store">
-                <img class="brand-logo" src="assets/logo/unspoken-store-logo.svg" alt="Store logo">
-            </span>
+            <div class="menu-title-block">
+                <span class="menu-eyebrow">Store Menu</span>
+                <span class="menu-logo" aria-label="Store">
+                    <img class="brand-logo" src="assets/logo/unspoken-store-logo.svg" alt="Store logo">
+                </span>
+            </div>
             <button class="close-btn" type="button" onclick="toggleMenu(false)" aria-label="Close menu">&times;</button>
         </div>
 
@@ -111,59 +114,22 @@
             </div>
         </div>
 
-        <div class="menu-scroll">
+        <div class="menu-scroll" id="menuDynamicContent" aria-live="polite">
             <section class="menu-content active" id="men">
-                <div class="menu-link-block">
-                    <h4>Shop by Categories</h4>
-                    <div class="menu-category-stack">
-                        <a href="men.html#tshirts">T-Shirts</a>
-                        <a class="menu-subcategory-link" href="men.html?fit=oversized#tshirts">Oversized Fit</a>
-                        <a class="menu-subcategory-link" href="men.html?fit=regular#tshirts">Regular Fit</a>
-                        <a href="men.html#shirts">Shirts</a>
-                        <a href="men.html#shorts">Shorts</a>
-                        <a href="men.html#sweatpants">Sweatpants</a>
-                    </div>
-                </div>
-
-                <a class="menu-cta-link" href="men.html">View All Men</a>
+                <div class="menu-loading">Loading men collection...</div>
             </section>
-
             <section class="menu-content" id="women">
-                <div class="menu-link-block">
-                    <h4>Shop by Categories</h4>
-                    <div class="menu-category-stack">
-                        <a href="women.html#tshirts">T-Shirts</a>
-                        <a class="menu-subcategory-link" href="women.html?fit=oversized#tshirts">Oversized Fit</a>
-                        <a class="menu-subcategory-link" href="women.html?fit=regular#tshirts">Regular Fit</a>
-                        <a href="women.html#tops">Tops</a>
-                        <a href="women.html#sweatpants">Sweatpants</a>
-                    </div>
-                </div>
-
-                <a class="menu-cta-link" href="women.html">View All Women</a>
+                <div class="menu-loading">Loading women collection...</div>
             </section>
-
             <section class="menu-content" id="unisex">
-                <div class="menu-link-block">
-                    <h4>Shop by Categories</h4>
-                    <div class="menu-category-stack">
-                        <a href="unisex.html#tshirts">T-Shirts</a>
-                        <a class="menu-subcategory-link" href="unisex.html?fit=oversized#tshirts">Oversized Fit</a>
-                        <a class="menu-subcategory-link" href="unisex.html?fit=regular#tshirts">Regular Fit</a>
-                    </div>
-                </div>
-
-                <a class="menu-cta-link" href="unisex.html">View All Unisex</a>
+                <div class="menu-loading">Loading unisex collection...</div>
             </section>
         </div>
 
-        <div class="menu-bottom">
+        <div class="menu-bottom" id="menuFooterContact">
             <div class="menu-bottom-row">
-                <a class="menu-bottom-btn" href="orders.html">My Orders</a>
-                <a class="menu-bottom-btn" href="cart.html">Cart</a>
                 <a class="menu-bottom-btn" href="#footerContact">Contact</a>
             </div>
-            <button type="button" onclick="openAuth(); toggleMenu(false)">My Account</button>
         </div>
     </div>
 </aside>
