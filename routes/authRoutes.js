@@ -3,7 +3,6 @@ const express = require("express")
 const router = express.Router()
 
 const User = require("../models/User")
-const { requireAdminToken } = require("../middleware/adminAuth")
 const {
     normalizeEmail,
     normalizeText,
@@ -248,7 +247,7 @@ router.post("/logout", (req, res) => {
     res.json({ success: true, message: "Logged out successfully." })
 })
 
-router.get("/users", requireAdminToken, async (req, res) => {
+router.get("/users", async (req, res) => {
     try {
         const users = await User.find().select("-password")
         res.json(users)

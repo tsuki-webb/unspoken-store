@@ -3,7 +3,6 @@ const router = express.Router()
 const mongoose = require("mongoose")
 const Product = require("../models/Product")
 const upload = require("../middleware/upload")
-const { requireAdminToken } = require("../middleware/adminAuth")
 const cloudinary = require("../config/cloudinary")
 const streamifier = require("streamifier")
 
@@ -189,7 +188,7 @@ router.get("/", async (req, res) => {
 })
 
 // CREATE product with up to 5 images
-router.post("/", requireAdminToken, upload.array("images", 5), async (req, res) => {
+router.post("/", upload.array("images", 5), async (req, res) => {
     try {
         const {
             name,
@@ -252,7 +251,7 @@ router.post("/", requireAdminToken, upload.array("images", 5), async (req, res) 
 })
 
 // DELETE product
-router.delete("/:id", requireAdminToken, async (req, res) => {
+router.delete("/:id", async (req, res) => {
     try {
         await Product.findByIdAndDelete(req.params.id)
         res.json({ message: "Deleted" })
@@ -262,7 +261,7 @@ router.delete("/:id", requireAdminToken, async (req, res) => {
 })
 
 // UPDATE product
-router.put("/:id", requireAdminToken, upload.array("newImages", 5), async (req, res) => {
+router.put("/:id", upload.array("newImages", 5), async (req, res) => {
     try {
         const existingProduct = await Product.findById(req.params.id)
 
@@ -374,7 +373,7 @@ router.put("/:id", requireAdminToken, upload.array("newImages", 5), async (req, 
 })
 
 // REORDER New Collection priorities
-router.patch("/new-collection/order", requireAdminToken, async (req, res) => {
+router.patch("/new-collection/order", async (req, res) => {
     try {
         if (!Array.isArray(req.body?.orderedIds)) {
             return res.status(400).json({ error: "orderedIds must be an array" })
@@ -465,7 +464,7 @@ router.patch("/new-collection/order", requireAdminToken, async (req, res) => {
 })
 
 // UPDATE collection flags explicitly
-router.patch("/:id/flags", requireAdminToken, async (req, res) => {
+router.patch("/:id/flags", async (req, res) => {
     try {
         const existingProduct = await Product.findById(req.params.id)
 

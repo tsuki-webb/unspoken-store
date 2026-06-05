@@ -5,7 +5,6 @@ const Razorpay = require("razorpay")
 const Order = require("../models/Order")
 const Cart = require("../models/Cart")
 const { resolveAuthenticatedUser } = require("../middleware/sessionAuth")
-const { requireAdminToken } = require("../middleware/adminAuth")
 
 const router = express.Router()
 
@@ -1037,7 +1036,7 @@ router.post("/:orderId/payment/failed", async (req, res) => {
     }
 })
 
-router.get("/admin/list", requireAdminToken, async (req, res) => {
+router.get("/admin/list", async (req, res) => {
     try {
         const query = {}
         const userEmail = normalizeLower(req.query?.userEmail)
@@ -1103,7 +1102,7 @@ router.get("/admin/list", requireAdminToken, async (req, res) => {
     }
 })
 
-router.patch("/admin/:orderId/status", requireAdminToken, async (req, res) => {
+router.patch("/admin/:orderId/status", async (req, res) => {
     try {
         const orderId = normalizeText(req.params?.orderId)
         const nextStatus = normalizeLower(req.body?.status)

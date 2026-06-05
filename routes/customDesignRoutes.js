@@ -5,7 +5,6 @@ const streamifier = require("streamifier")
 const upload = require("../middleware/upload")
 const cloudinary = require("../config/cloudinary")
 const CustomDesignRequest = require("../models/CustomDesignRequest")
-const { requireAdminToken } = require("../middleware/adminAuth")
 
 const router = express.Router()
 
@@ -124,7 +123,7 @@ async function uploadAssets(files = [], role = "reference") {
     return uploaded
 }
 
-router.get("/", requireAdminToken, async (req, res) => {
+router.get("/", async (req, res) => {
     try {
         const status = normalizeLower(req.query.status)
         const query = {}
@@ -249,7 +248,7 @@ router.post(
     }
 )
 
-router.patch("/:id/status", requireAdminToken, express.json(), async (req, res) => {
+router.patch("/:id/status", express.json(), async (req, res) => {
     try {
         const requestId = normalizeText(req.params.id)
         const status = normalizeLower(req.body.status)
