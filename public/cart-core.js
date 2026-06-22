@@ -25,6 +25,7 @@
         authenticated: false,
         user: null
     }
+    let sessionRefreshRunId = 0
 
     function normalizeEmail(value) {
         return String(value || "").trim().toLowerCase()
@@ -167,16 +168,25 @@
         return payload
     }
 
-    async function refreshSession({ silent = false } = {}) {
-        if (sessionState.loadingPromise) {
+    async function refreshSession({ silent = false, force = false } = {}) {
+        if (sessionState.loadingPromise && !force) {
             return sessionState.loadingPromise
         }
+
+        const runId = ++sessionRefreshRunId
 
         sessionState.loadingPromise = (async () => {
             try {
                 const payload = await requestJson("/api/auth/session")
                 const authenticated = !!payload?.authenticated
                 const email = normalizeEmail(payload?.user?.email)
+
+                if (runId !== sessionRefreshRunId) {
+                    return {
+                        authenticated: sessionState.authenticated,
+                        user: sessionState.user
+                    }
+                }
 
                 if (authenticated && email) {
                     sessionState.loaded = true
@@ -202,6 +212,13 @@
                     console.log("Session refresh error:", err)
                 }
 
+                if (runId !== sessionRefreshRunId) {
+                    return {
+                        authenticated: sessionState.authenticated,
+                        user: sessionState.user
+                    }
+                }
+
                 const fallbackUser = getFallbackUserFromLocalStorage()
                 sessionState.loaded = true
                 sessionState.authenticated = !!fallbackUser
@@ -212,7 +229,9 @@
                     user: fallbackUser
                 }
             } finally {
-                sessionState.loadingPromise = null
+                if (runId === sessionRefreshRunId) {
+                    sessionState.loadingPromise = null
+                }
             }
         })()
 

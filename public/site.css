@@ -29,6 +29,21 @@ body {
     overflow-x: hidden;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+    background-color: #f7efe5;
+    color: #171412;
+    line-height: 1.5;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.78), transparent 34%),
+        radial-gradient(circle at 88% 0%, rgba(200, 111, 45, 0.13), transparent 24%);
+    opacity: 0.95;
 }
 
 img,
@@ -56,8 +71,37 @@ textarea {
 
 a,
 button,
-[role="button"] {
+[role="button"],
+input,
+select,
+textarea {
     touch-action: manipulation;
+}
+
+a,
+button,
+[role="button"] {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+a:hover,
+button:hover,
+[role="button"]:hover {
+    transform: translateY(-1px);
+}
+
+input,
+select,
+textarea {
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #111111;
+    box-shadow: 0 0 0 4px rgba(17, 17, 17, 0.08);
 }
 
 :focus-visible {
@@ -155,4 +199,33 @@ body {
     body {
         min-width: 0;
     }
+}
+
+/* Wishlist heart button (consistent, accessible, mobile-friendly) */
+.home-product-media { position: relative; }
+.wishlist-btn {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.9);
+    border: 1px solid var(--site-border);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    z-index: 6;
+    transition: transform 0.14s ease, background-color 0.14s ease, color 0.14s ease;
+}
+.wishlist-btn:active { transform: scale(0.96); }
+.wishlist-btn .heart { color: #ab9b8b; }
+.wishlist-btn.active { background: #111; border-color: rgba(17,17,17,0.12); }
+.wishlist-btn.active .heart { color: #fff; }
+
+@media (max-width: 520px) {
+    .wishlist-btn { width: 36px; height: 36px; top: 8px; left: 8px; }
 }

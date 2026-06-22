@@ -698,6 +698,7 @@ window.openAuth = function() {
         authOverlay.classList.add("active")
     }
 
+    setAuthMode("login")
     syncPageScrollLock()
 }
 
@@ -719,6 +720,55 @@ if (authOverlay) {
 window.googleLogin = window.googleLogin || function () {
     alert("Google Sign-In is loading. Please try again.")
 }
+
+function setAuthMode(mode = "login") {
+    const normalizedMode = mode === "signup" ? "signup" : "login"
+
+    document.querySelectorAll("[data-auth-mode-btn]").forEach(button => {
+        button.classList.toggle("active", button.dataset.authModeBtn === normalizedMode)
+    })
+
+    document.querySelectorAll("[data-auth-view]").forEach(view => {
+        view.classList.toggle("active", view.dataset.authView === normalizedMode)
+    })
+
+    setAuthMethod(normalizedMode, "email")
+}
+
+function setAuthMethod(mode = "login", method = "email") {
+    const normalizedMode = mode === "signup" ? "signup" : "login"
+    const normalizedMethod = ["email", "google", "phone"].includes(method) ? method : "email"
+    const key = `${normalizedMode}-${normalizedMethod}`
+
+    document.querySelectorAll(`[data-auth-method-btn^="${normalizedMode}-"]`).forEach(button => {
+        button.classList.toggle("active", button.dataset.authMethodBtn === key)
+    })
+
+    document.querySelectorAll(`[data-auth-method^="${normalizedMode}-"]`).forEach(panel => {
+        panel.classList.toggle("active", panel.dataset.authMethod === key)
+    })
+}
+
+function startPhoneAuth(mode = "login") {
+    const inputId = mode === "signup" ? "signupOtpPhone" : "loginPhone"
+    const phone = String(document.getElementById(inputId)?.value || "").trim()
+
+    if (!phone) {
+        alert("Enter your phone number first.")
+        return
+    }
+
+    alert("Phone OTP is ready in the UI, but Firebase Phone Authentication still needs to be enabled and connected before OTPs can be sent.")
+}
+
+function verifyPhoneOtp() {
+    alert("Phone OTP is still loading. Please try again in a moment.")
+}
+
+window.setAuthMode = setAuthMode
+window.setAuthMethod = setAuthMethod
+window.startPhoneAuth = startPhoneAuth
+window.verifyPhoneOtp = verifyPhoneOtp
 
 // ================= MENU TABS =================
 function switchTab(tabId, clickEvent){
@@ -755,12 +805,18 @@ function setLocalUserState(user) {
     if (photo) {
         localStorage.setItem("userPhoto", photo)
     }
+
+    const phone = String(user?.phone || "").trim()
+    if (phone) {
+        localStorage.setItem("userPhone", phone)
+    }
 }
 
 function clearLocalUserState() {
     localStorage.removeItem("userEmail")
     localStorage.removeItem("userName")
     localStorage.removeItem("userPhoto")
+    localStorage.removeItem("userPhone")
 }
 
 function getRedirectAfterAuth() {
@@ -799,11 +855,19 @@ async function syncAuthStateFromBackend() {
 
 // ================= SIGNUP =================
 async function signup() {
+    const name = String(document.getElementById("signupName")?.value || "").trim()
     const email = String(document.getElementById("signupEmail").value || "").trim()
     const password = String(document.getElementById("signupPassword").value || "").trim()
+    const phone = String(document.getElementById("signupPhone")?.value || "").trim()
+    const wantsUpdates = !!document.getElementById("signupUpdates")?.checked
 
-    if (!email || !password) {
-        alert("Please fill all fields")
+    if (!name || !email || !password) {
+        alert("Please fill your name, email, and password.")
+        return
+    }
+
+    if (password.length < 6) {
+        alert("Password should be at least 6 characters.")
         return
     }
 
@@ -812,7 +876,13 @@ async function signup() {
             method: "POST",
             credentials: "same-origin",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({
+                email,
+                password,
+                name,
+                phone,
+                wantsUpdates
+            })
         })
 
         const data = await res.json()
@@ -893,7 +963,12 @@ function updateNavbarUserState(){
     const userName = backendUser?.name || localStorage.getItem("userName")
     const userEmail = backendUser?.email || localStorage.getItem("userEmail")
     const userPhoto = backendUser?.photo || localStorage.getItem("userPhoto")
+    const userPhone = backendUser?.phone || localStorage.getItem("userPhone")
     const derivedName = userName || (userEmail ? String(userEmail).split("@")[0] : "")
+    const isSignedIn = !!userEmail
+    const displayContact = String(userEmail || "").endsWith("@phone.unspoken.local") && userPhone
+        ? userPhone
+        : userEmail
 
     const signinBtn = document.getElementById("signinBtn")
     const profileWrapper = document.getElementById("profileWrapper")
@@ -903,14 +978,16 @@ function updateNavbarUserState(){
 
     const showMobileProfile = mobileNavQuery.matches
 
-    if(derivedName){
+    if(isSignedIn){
         if(signinBtn) signinBtn.style.display = "none"
         if(profileWrapper) profileWrapper.style.display = "flex"
 
         if(userPhoto && profileCircle){
             profileCircle.innerHTML = `<img src="${userPhoto}" alt="User profile" style="width:100%;height:100%;border-radius:50%">`
+            profileCircle.setAttribute("aria-label", "Open account menu")
         } else if (profileCircle) {
             profileCircle.textContent = derivedName.charAt(0).toUpperCase()
+            profileCircle.setAttribute("aria-label", "Open account menu")
         }
 
         if (profileMenuName) {
@@ -918,7 +995,7 @@ function updateNavbarUserState(){
         }
 
         if (profileMenuEmail) {
-            profileMenuEmail.textContent = userEmail || "Signed in"
+            profileMenuEmail.textContent = displayContact || "Signed in"
         }
     } else {
         if(signinBtn) signinBtn.style.display = showMobileProfile ? "none" : "inline-block"
@@ -926,6 +1003,7 @@ function updateNavbarUserState(){
 
         if (profileCircle) {
             profileCircle.textContent = "U"
+            profileCircle.setAttribute("aria-label", "Sign in")
         }
 
         if (profileMenuName) {
@@ -935,6 +1013,11 @@ function updateNavbarUserState(){
         if (profileMenuEmail) {
             profileMenuEmail.textContent = "Sign in to continue"
         }
+    }
+
+    // If user signed-in state changed, refresh wishlist UI
+    if (typeof loadUserWishlist === "function") {
+        setTimeout(() => loadUserWishlist(), 160)
     }
 
     if (document.body?.classList.contains("auth-pending")) {
@@ -953,7 +1036,20 @@ function toggleProfileMenu(){
     const menu = document.getElementById("profileMenu")
     const trigger = document.querySelector(".profile-circle")
     if(!menu) return
+
+    const userEmail = window.LuxoraCart?.getUser?.()?.email || localStorage.getItem("userEmail")
+    if (!userEmail) {
+        closeProfileMenu()
+        openAuth()
+        return
+    }
+
     const isOpen = !menu.classList.contains("active")
+    if (isOpen) {
+        if (isMenuOpen()) toggleMenu(false)
+        closeHomeSearchResults()
+    }
+
     menu.classList.toggle("active", isOpen)
     if (trigger) trigger.setAttribute("aria-expanded", isOpen ? "true" : "false")
 }
@@ -1055,7 +1151,8 @@ window.quickAddToCart = async function(productId, buttonEl) {
 }
 
 function renderHomeProductCard(product) {
-    const productId = encodeURIComponent(String(product?._id || ""))
+    const productIdRaw = String(product?._id || "")
+    const productId = encodeURIComponent(productIdRaw)
     const productName = escapeHtml(product?.name || "Store Product")
     const productImage = escapeHtml(product?.images?.[0] || product?.image || "")
     const productPrice = escapeHtml(product?.price)
@@ -1066,10 +1163,13 @@ function renderHomeProductCard(product) {
     ].filter(Boolean).join("")
 
     return `
-        <article class="product-card" onclick="window.location.href='product.html?id=${productId}'">
+        <article class="product-card" data-product-id="${productId}" onclick="window.location.href='product.html?id=${productId}'">
             <div class="home-product-media">
                 <img src="${productImage}" alt="${productName}" loading="lazy" decoding="async">
                 ${badges ? `<div class="home-product-badges">${badges}</div>` : ""}
+                <button class="wishlist-btn" type="button" data-product-id="${productIdRaw}" onclick="event.stopPropagation(); toggleWishlist('${productIdRaw}', this)" aria-label="Toggle wishlist">
+                    <span class="heart">&#9825;</span>
+                </button>
             </div>
             <div class="home-product-copy">
                 <h4>${productName}</h4>
@@ -1082,6 +1182,125 @@ function renderHomeProductCard(product) {
         </article>
     `
 }
+
+// ----------------- Wishlist client handlers -----------------
+window.userWishlist = new Set()
+
+async function loadUserWishlist() {
+    try {
+        const localEmail = localStorage.getItem("userEmail") || ""
+        const backendEmail = (window.LuxoraCart?.getUser?.() || {}).email || ""
+        const userEmail = localEmail || backendEmail || ""
+        const query = userEmail ? `?userEmail=${encodeURIComponent(userEmail)}` : ""
+        const headers = {}
+        if (userEmail) headers["x-user-email"] = userEmail
+        const res = await fetch(`/api/wishlist${query}`, { credentials: "include", headers })
+        if (!res.ok) return
+        const data = await res.json()
+        if (!Array.isArray(data)) return
+        window.userWishlist = new Set(data.map(p => String(p._id || p)))
+
+        // mark buttons on page
+        document.querySelectorAll(".wishlist-btn").forEach(btn => {
+            const pid = String(btn.dataset.productId || "")
+            if (window.userWishlist.has(pid)) btn.classList.add("active")
+            else btn.classList.remove("active")
+        })
+
+        // update navbar badge if present
+        const badge = document.querySelector("[data-wishlist-count]")
+        if (badge) {
+            const count = window.userWishlist.size || 0
+            badge.textContent = String(count)
+            badge.classList.toggle("hidden", count === 0)
+        }
+
+        window.dispatchEvent(new CustomEvent("luxora:wishlist-loaded", {
+            detail: {
+                ids: Array.from(window.userWishlist)
+            }
+        }))
+    } catch (err) {
+        console.log("loadUserWishlist error:", err)
+    }
+}
+
+async function toggleWishlist(productId, el) {
+    try {
+        const localEmail = localStorage.getItem("userEmail") || ""
+        const backendEmail = (window.LuxoraCart?.getUser?.() || {}).email || ""
+        const userEmail = localEmail || backendEmail || ""
+
+        if (!userEmail) {
+            // prompt sign in first
+            if (typeof openAuth === "function") openAuth()
+            else alert("Please sign in to save items to your wishlist.")
+            return
+        }
+
+        const headers = { "Content-Type": "application/json", "x-user-email": userEmail }
+
+        const res = await fetch(`/api/wishlist/toggle`, {
+            method: "POST",
+            credentials: "include",
+            headers,
+            body: JSON.stringify({ productId, userEmail })
+        })
+
+        let payload = null
+        try { payload = await res.json() } catch (e) { payload = null }
+
+        if (!res.ok) {
+            const serverMsg = payload?.message || payload?.error || (await res.text().catch(() => ""))
+            console.error("Wishlist toggle failed:", res.status, serverMsg, payload)
+            if (res.status === 401) {
+                alert(serverMsg || "Please sign in to save items to your wishlist.")
+                if (typeof openAuth === "function") openAuth()
+                return
+            }
+
+            alert(serverMsg || "Unable to update wishlist. Please try again.")
+            return
+        }
+        const ids = Array.isArray(payload?.wishlist) ? payload.wishlist.map(p => String(p._id || p)) : []
+        window.userWishlist = new Set(ids)
+
+        // update button states
+        document.querySelectorAll(`.wishlist-btn[data-product-id]`).forEach(btn => {
+            const pid = String(btn.dataset.productId || "")
+            if (window.userWishlist.has(pid)) btn.classList.add("active")
+            else btn.classList.remove("active")
+        })
+        const badge = document.querySelector("[data-wishlist-count]")
+        if (badge) {
+            const count = window.userWishlist.size || 0
+            badge.textContent = String(count)
+            badge.classList.toggle("hidden", count === 0)
+        }
+
+        window.dispatchEvent(new CustomEvent("luxora:wishlist-updated", {
+            detail: {
+                ids,
+                productId: String(productId || ""),
+                wishlist: payload?.wishlist || []
+            }
+        }))
+
+        return payload
+    } catch (err) {
+        console.log("toggleWishlist error:", err)
+        return null
+    }
+}
+
+window.loadUserWishlist = loadUserWishlist
+window.toggleWishlist = toggleWishlist
+
+// Call loadUserWishlist once DOM is ready and after auth sync
+document.addEventListener("DOMContentLoaded", () => {
+    // small timeout to let other page scripts sync auth
+    setTimeout(() => loadUserWishlist(), 120)
+})
 
 // ================= NEW COLLECTION =================
 async function loadNewCollection() {

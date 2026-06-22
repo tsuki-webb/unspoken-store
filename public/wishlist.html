@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wishlist - Unspoken Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="brand.css">
+    <link rel="stylesheet" href="site.css">
+    <link rel="stylesheet" href="index.css">
+</head>
+<body class="home-page wishlist-page">
+
+<header class="navbar">
+    <a class="logo" href="index.html" aria-label="Home">
+        <img class="brand-logo" src="assets/logo/unspoken-store-logo.svg" alt="Store logo">
+    </a>
+
+    <nav class="nav-links">
+        <a href="men.html">MEN</a>
+        <a href="women.html">WOMEN</a>
+        <a href="unisex.html">UNISEX</a>
+    </nav>
+
+    <div class="nav-icons">
+        <a class="nav-icon wishlist-link" href="wishlist.html" aria-label="Wishlist">&#9825;<span class="wishlist-count-badge hidden" data-wishlist-count>0</span></a>
+        <a class="nav-icon cart-link-icon" href="cart.html" aria-label="Open cart">&#128722;<span class="cart-count-badge hidden" data-cart-count>0</span></a>
+    </div>
+</header>
+
+<main id="mainContent">
+    <section class="product-section">
+        <div class="section-header">
+            <span class="section-kicker">MY LIST</span>
+            <h2>Your Wishlist</h2>
+            <p>Items you saved for later. Add to cart or remove from wishlist anytime.</p>
+        </div>
+
+        <div class="featured-grid" id="wishlistContainer"></div>
+    </section>
+</main>
+
+<script src="cart-core.js"></script>
+<script src="index.js"></script>
+<script src="wishlist.js"></script>
+</body>
+</html>

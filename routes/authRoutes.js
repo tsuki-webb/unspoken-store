@@ -63,6 +63,20 @@ function deriveNameFromEmail(email) {
         .join(" ")
 }
 
+function normalizePhone(value) {
+    return normalizeText(value).replace(/\s+/g, "")
+}
+
+function isValidPhone(value) {
+    return /^\+[1-9]\d{7,14}$/.test(normalizePhone(value))
+}
+
+function deriveEmailFromPhone(phone) {
+    const digits = normalizePhone(phone).replace(/\D/g, "")
+    if (!digits) return ""
+    return `${digits}@phone.unspoken.local`
+}
+
 function requireValidEmailAndPassword(res, email, password) {
     if (!isValidEmail(email)) {
         res.status(400).json({ success: false, message: "Please provide a valid email address." })
@@ -93,6 +107,8 @@ router.post("/signup", async (req, res) => {
         const email = normalizeEmail(req.body?.email)
         const password = String(req.body?.password || "")
         const name = normalizeText(req.body?.name)
+        const phone = normalizePhone(req.body?.phone)
+        const wantsUpdates = req.body?.wantsUpdates !== false
 
         if (!requireValidEmailAndPassword(res, email, password)) return
 
@@ -110,6 +126,8 @@ router.post("/signup", async (req, res) => {
             email,
             password: hashPassword(password),
             name: name || deriveNameFromEmail(email),
+            phone: isValidPhone(phone) ? phone : "",
+            wantsUpdates,
             provider: "email"
         })
 
@@ -167,6 +185,43 @@ router.post("/login", async (req, res) => {
     } catch (err) {
         console.log("AUTH LOGIN ERROR:", err)
         res.status(500).json({ success: false, message: "Unable to login right now." })
+    }
+})
+
+router.post("/phone", async (req, res) => {
+    try {
+        const phone = normalizePhone(req.body?.phone)
+        const firebaseUid = normalizeText(req.body?.firebaseUid)
+
+        if (!isValidPhone(phone) || !firebaseUid) {
+            return res.status(400).json({
+                success: false,
+                message: "A verified Firebase phone number is required."
+            })
+        }
+
+        const email = deriveEmailFromPhone(phone)
+        let user = await User.findOne({ email })
+
+        if (!user) {
+            user = new User({
+                email,
+                password: hashPassword(crypto.randomBytes(24).toString("hex")),
+                name: `Member ${phone.slice(-4)}`,
+                phone,
+                provider: "phone"
+            })
+        } else {
+            user.phone = phone
+            user.provider = "phone"
+            if (!normalizeText(user.name)) user.name = `Member ${phone.slice(-4)}`
+        }
+
+        await user.save()
+        await loginUserAndRespond(res, user, "Phone login successful.")
+    } catch (err) {
+        console.log("AUTH PHONE ERROR:", err)
+        res.status(500).json({ success: false, message: "Phone login failed." })
     }
 })
 

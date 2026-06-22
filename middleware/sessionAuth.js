@@ -151,6 +151,7 @@ function toPublicUser(user, fallbackEmail = "") {
         email,
         name: normalizeText(user?.name || fallbackName),
         photo: normalizeText(user?.photo || ""),
+        phone: normalizeText(user?.phone || ""),
         provider: normalizeText(user?.provider || "email")
     }
 }
@@ -161,7 +162,7 @@ async function resolveAuthenticatedUser(req, options = {}) {
 
     if (sessionEmail) {
         const user = await User.findOne({ email: sessionEmail })
-            .select("email name photo provider")
+            .select("email name photo phone provider")
             .lean()
 
         if (user) {
@@ -183,7 +184,7 @@ async function resolveAuthenticatedUser(req, options = {}) {
     }
 
     const user = await User.findOne({ email: fallbackEmail })
-        .select("email name photo provider")
+        .select("email name photo phone provider")
         .lean()
 
     if (!user) {

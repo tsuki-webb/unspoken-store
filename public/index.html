@@ -77,7 +77,7 @@
             </div>
         </div>
 
-        <button class="nav-icon" type="button" title="Wishlist coming soon" aria-label="Wishlist coming soon">&#9825;</button>
+        <a class="nav-icon wishlist-link" href="wishlist.html" title="Wishlist" aria-label="Wishlist">&#9825;<span class="wishlist-count-badge hidden" data-wishlist-count>0</span></a>
         <a class="nav-icon cart-link-icon" href="cart.html" title="Cart" aria-label="Open cart">
             &#128722;
             <span class="cart-count-badge hidden" data-cart-count>0</span>
@@ -89,7 +89,7 @@
     <div class="menu-shell">
         <div class="menu-top">
             <div class="menu-title-block">
-                <span class="menu-eyebrow">Store Menu</span>
+                
                 <span class="menu-logo" aria-label="Store">
                     <img class="brand-logo" src="assets/logo/unspoken-store-logo.svg" alt="Store logo">
                 </span>
@@ -109,9 +109,9 @@
                 <input id="menuSearchInput" type="text" placeholder="Search products" autocomplete="off" aria-label="Search products from the menu">
                 <button id="menuSearchBtn" class="menu-search-btn" type="button">Search</button>
             </div>
-            <div class="menu-search-results" id="menuSearchResults" aria-live="polite" aria-atomic="true">
+            <!-- <div class="menu-search-results" id="menuSearchResults" aria-live="polite" aria-atomic="true">
                 <p class="menu-search-hint">Type at least 2 letters to search.</p>
-            </div>
+            </div> -->
         </div>
 
         <div class="menu-scroll" id="menuDynamicContent" aria-live="polite">
@@ -545,29 +545,128 @@
 </main>
 
 <div class="auth-overlay" id="authOverlay">
-    <div class="auth-box" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <section class="auth-stage" role="dialog" aria-modal="true" aria-labelledby="authTitle">
         <button class="auth-close" type="button" onclick="closeAuth()" aria-label="Close sign in dialog">&times;</button>
 
-        <h2 id="authTitle">Sign In</h2>
+        <div class="auth-art" aria-hidden="true">
+            <span class="auth-mark">UNSPOKEN</span>
+            <span class="auth-line line-one"></span>
+            <span class="auth-line line-two"></span>
+            <span class="auth-line line-three"></span>
+            <span class="auth-cut cut-one"></span>
+            <span class="auth-cut cut-two"></span>
+        </div>
 
-        <input type="email" id="loginEmail" placeholder="Email" autocomplete="email" aria-label="Email address">
-        <input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password" aria-label="Password">
+        <div class="auth-panel">
+            <div class="auth-copy">
+                <span class="auth-kicker">Members only energy</span>
+                <h2 id="authTitle">Join the club</h2>
+                <p>Sign in to save pieces, build a wishlist, and keep your cart synced across the store.</p>
+            </div>
 
-        <button type="button" onclick="login()">Login</button>
+            <div class="auth-mode-switch" role="tablist" aria-label="Choose auth mode">
+                <button class="active" type="button" data-auth-mode-btn="login" onclick="setAuthMode('login')">Login</button>
+                <button type="button" data-auth-mode-btn="signup" onclick="setAuthMode('signup')">Sign Up</button>
+            </div>
 
-        <p>Don't have an account?</p>
+            <div class="auth-workspace">
+                <div class="auth-view active" data-auth-view="login">
+                    <div class="auth-methods" role="tablist" aria-label="Choose login method">
+                        <button class="active" type="button" data-auth-method-btn="login-email" onclick="setAuthMethod('login', 'email')">Email</button>
+                        <button type="button" data-auth-method-btn="login-google" onclick="setAuthMethod('login', 'google')">Google</button>
+                        <button type="button" data-auth-method-btn="login-phone" onclick="setAuthMethod('login', 'phone')">Phone</button>
+                    </div>
 
-        <h3>Create Account</h3>
+                    <div class="auth-method active" data-auth-method="login-email">
+                        <label>
+                            <span>Email</span>
+                            <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email" aria-label="Email address">
+                        </label>
+                        <label>
+                            <span>Password</span>
+                            <input type="password" id="loginPassword" placeholder="Your password" autocomplete="current-password" aria-label="Password">
+                        </label>
+                        <button class="auth-primary" type="button" onclick="login()">Login</button>
+                    </div>
 
-        <input type="email" id="signupEmail" placeholder="Email" autocomplete="email" aria-label="Create account email">
-        <input type="password" id="signupPassword" placeholder="Password" autocomplete="new-password" aria-label="Create account password">
+                    <div class="auth-method" data-auth-method="login-google">
+                        <button type="button" onclick="googleLogin()" class="auth-social-btn google-btn">Continue with Google</button>
+                    </div>
 
-        <button type="button" onclick="signup()">Create Account</button>
+                    <div class="auth-method" data-auth-method="login-phone">
+                        <label>
+                            <span>Phone Number</span>
+                            <input type="tel" id="loginPhone" placeholder="+91 98765 43210" autocomplete="tel" aria-label="Login phone number">
+                        </label>
+                        <button class="auth-primary" id="loginPhoneSendBtn" type="button" onclick="startPhoneAuth('login')">Send OTP</button>
+                        <div class="auth-otp-box" id="loginOtpBox" hidden>
+                            <label>
+                                <span>OTP Code</span>
+                                <input type="text" id="loginOtpCode" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="Enter OTP" aria-label="Login OTP code">
+                            </label>
+                            <button class="auth-primary auth-secondary-action" id="loginPhoneVerifyBtn" type="button" onclick="verifyPhoneOtp('login')">Verify &amp; Login</button>
+                        </div>
+                        <p class="auth-status" id="loginPhoneStatus" aria-live="polite"></p>
+                    </div>
+                </div>
 
-        <button type="button" onclick="googleLogin()" class="google-btn">
-            Continue with Google
-        </button>
-    </div>
+                <div class="auth-view" data-auth-view="signup">
+                    <div class="auth-methods" role="tablist" aria-label="Choose signup method">
+                        <button class="active" type="button" data-auth-method-btn="signup-email" onclick="setAuthMethod('signup', 'email')">Email</button>
+                        <button type="button" data-auth-method-btn="signup-google" onclick="setAuthMethod('signup', 'google')">Google</button>
+                        <button type="button" data-auth-method-btn="signup-phone" onclick="setAuthMethod('signup', 'phone')">Phone</button>
+                    </div>
+
+                    <div class="auth-method active" data-auth-method="signup-email">
+                        <div class="auth-grid-fields">
+                            <label>
+                                <span>Name</span>
+                                <input type="text" id="signupName" placeholder="Your name" autocomplete="name" aria-label="Full name">
+                            </label>
+                            <label>
+                                <span>Email</span>
+                                <input type="email" id="signupEmail" placeholder="you@example.com" autocomplete="email" aria-label="Create account email">
+                            </label>
+                            <label>
+                                <span>Password</span>
+                                <input type="password" id="signupPassword" placeholder="Create password" autocomplete="new-password" aria-label="Create account password">
+                            </label>
+                            <label>
+                                <span>Phone</span>
+                                <input type="tel" id="signupPhone" placeholder="+91 98765 43210" autocomplete="tel" aria-label="Phone number">
+                            </label>
+                        </div>
+                        <label class="auth-check">
+                            <input type="checkbox" id="signupUpdates" checked>
+                            <span>Send me early drop access</span>
+                        </label>
+                        <button class="auth-primary" type="button" onclick="signup()">Create Account</button>
+                    </div>
+
+                    <div class="auth-method" data-auth-method="signup-google">
+                        <button type="button" onclick="googleLogin()" class="auth-social-btn google-btn">Sign up with Google</button>
+                    </div>
+
+                    <div class="auth-method" data-auth-method="signup-phone">
+                        <label>
+                            <span>Phone Number</span>
+                            <input type="tel" id="signupOtpPhone" placeholder="+91 98765 43210" autocomplete="tel" aria-label="Signup phone number">
+                        </label>
+                        <button class="auth-primary" id="signupPhoneSendBtn" type="button" onclick="startPhoneAuth('signup')">Send OTP</button>
+                        <div class="auth-otp-box" id="signupOtpBox" hidden>
+                            <label>
+                                <span>OTP Code</span>
+                                <input type="text" id="signupOtpCode" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="Enter OTP" aria-label="Signup OTP code">
+                            </label>
+                            <button class="auth-primary auth-secondary-action" id="signupPhoneVerifyBtn" type="button" onclick="verifyPhoneOtp('signup')">Verify &amp; Create Account</button>
+                        </div>
+                        <p class="auth-status" id="signupPhoneStatus" aria-live="polite"></p>
+                    </div>
+                </div>
+            </div>
+            <div id="phoneRecaptcha" class="auth-recaptcha" aria-hidden="true"></div>
+        </div>
+    </section>
 </div>
 
 <script src="cart-core.js"></script>
@@ -578,8 +677,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebas
 import {
     getAuth,
     GoogleAuthProvider,
+    RecaptchaVerifier,
     signInWithPopup,
     signInWithRedirect,
+    signInWithPhoneNumber,
     getRedirectResult
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js"
 
@@ -594,9 +695,113 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig)
 const auth = getAuth(app)
+if (["localhost", "127.0.0.1"].includes(window.location.hostname)) {
+    auth.settings.appVerificationDisabledForTesting = true
+}
 window.auth = auth
 const googleProvider = new GoogleAuthProvider()
 googleProvider.setCustomParameters({ prompt: "select_account" })
+let phoneRecaptchaVerifier = null
+let phoneRecaptchaMode = ""
+const phoneConfirmations = { login: null, signup: null }
+
+function phoneAuthElements(mode) {
+    const normalizedMode = mode === "signup" ? "signup" : "login"
+    return {
+        phoneInput: document.getElementById(normalizedMode === "signup" ? "signupOtpPhone" : "loginPhone"),
+        otpInput: document.getElementById(normalizedMode === "signup" ? "signupOtpCode" : "loginOtpCode"),
+        otpBox: document.getElementById(normalizedMode === "signup" ? "signupOtpBox" : "loginOtpBox"),
+        sendBtn: document.getElementById(normalizedMode === "signup" ? "signupPhoneSendBtn" : "loginPhoneSendBtn"),
+        verifyBtn: document.getElementById(normalizedMode === "signup" ? "signupPhoneVerifyBtn" : "loginPhoneVerifyBtn"),
+        status: document.getElementById(normalizedMode === "signup" ? "signupPhoneStatus" : "loginPhoneStatus")
+    }
+}
+
+function setPhoneStatus(mode, message = "", tone = "") {
+    const status = phoneAuthElements(mode).status
+    if (!status) return
+    status.textContent = message
+    status.dataset.tone = tone
+}
+
+function normalizePhoneNumber(rawPhone) {
+    const phone = String(rawPhone || "").replace(/\s+/g, "")
+    if (!/^\+[1-9]\d{7,14}$/.test(phone)) return ""
+    return phone
+}
+
+function getPhoneRecaptchaVerifier(mode) {
+    const normalizedMode = mode === "signup" ? "signup" : "login"
+    const buttonId = normalizedMode === "signup" ? "signupPhoneSendBtn" : "loginPhoneSendBtn"
+
+    if (phoneRecaptchaVerifier && phoneRecaptchaMode === normalizedMode) return phoneRecaptchaVerifier
+
+    if (phoneRecaptchaVerifier) {
+        try {
+            phoneRecaptchaVerifier.clear()
+        } catch (err) {
+            console.log("Phone reCAPTCHA clear error:", err)
+        }
+    }
+
+    phoneRecaptchaMode = normalizedMode
+    phoneRecaptchaVerifier = new RecaptchaVerifier(auth, buttonId, {
+        size: "invisible",
+        callback: () => {}
+    })
+
+    return phoneRecaptchaVerifier
+}
+
+async function completePhoneLogin(firebaseUser, mode) {
+    const idToken = await firebaseUser.getIdToken()
+    const response = await fetch("/api/auth/phone", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            phone: firebaseUser.phoneNumber,
+            firebaseUid: firebaseUser.uid,
+            idToken,
+            mode
+        })
+    })
+
+    const rawBody = await response.text().catch(() => "")
+    let payload = {}
+
+    try {
+        payload = rawBody ? JSON.parse(rawBody) : {}
+    } catch (err) {
+        payload = {}
+    }
+
+    if (!response.ok || !payload?.success) {
+        const serverMessage = payload?.message || rawBody
+        throw new Error(serverMessage || `Phone login verified, but the store session failed (HTTP ${response.status}).`)
+    }
+
+    if (payload.user) {
+        localStorage.setItem("userEmail", payload.user.email)
+        localStorage.setItem("userName", payload.user.name || payload.user.phone || "Member")
+        if (payload.user.photo) localStorage.setItem("userPhoto", payload.user.photo)
+        if (payload.user.phone) localStorage.setItem("userPhone", payload.user.phone)
+    }
+
+    await window.LuxoraCart?.refreshSession?.({ silent: true, force: true })
+    window.LuxoraCart?.refreshCartCount()
+    window.updateNavbarUserState?.()
+    window.closeAuth?.()
+
+    const params = new URLSearchParams(window.location.search)
+    const next = String(params.get("next") || "").trim()
+    if (next && next.startsWith("/") && !next.startsWith("//")) {
+        window.location.href = next
+        return
+    }
+
+    alert(mode === "signup" ? "Phone account created" : "Phone login successful")
+}
 
 function showFirebaseLoginProblem(message, error) {
     console.error("Firebase Google login error:", error)
@@ -644,7 +849,11 @@ async function completeGoogleLogin(user) {
     if (payload?.user?.name) localStorage.setItem("userName", payload.user.name)
     if (payload?.user?.photo) localStorage.setItem("userPhoto", payload.user.photo)
 
-    await window.LuxoraCart?.refreshSession?.({ silent: true })
+    const session = await window.LuxoraCart?.refreshSession?.({ silent: true, force: true })
+    if (session?.authenticated === false) {
+        throw new Error("Google login finished, but the store session was not created. Please try again.")
+    }
+
     window.LuxoraCart?.refreshCartCount()
     window.updateNavbarUserState?.()
     window.closeAuth?.()
@@ -698,6 +907,89 @@ window.googleLogin = async function () {
 
         console.error("Google popup login error:", err)
         alert(err?.message || "Google login failed")
+    }
+}
+
+window.startPhoneAuth = async function (mode = "login") {
+    const normalizedMode = mode === "signup" ? "signup" : "login"
+    const elements = phoneAuthElements(normalizedMode)
+    const phone = normalizePhoneNumber(elements.phoneInput?.value)
+
+    if (!phone) {
+        setPhoneStatus(normalizedMode, "Use international format, for example +919876543210.", "error")
+        elements.phoneInput?.focus()
+        return
+    }
+
+    try {
+        elements.sendBtn.disabled = true
+        setPhoneStatus(normalizedMode, "Sending OTP...", "")
+
+        const confirmation = await signInWithPhoneNumber(auth, phone, getPhoneRecaptchaVerifier(normalizedMode))
+        phoneConfirmations[normalizedMode] = confirmation
+
+        if (elements.otpBox) elements.otpBox.hidden = false
+        elements.otpInput?.focus()
+        setPhoneStatus(normalizedMode, "OTP sent. Enter the code to continue.", "success")
+    } catch (err) {
+        console.error("Phone OTP send error:", err)
+
+        if (phoneRecaptchaVerifier) {
+            try {
+                phoneRecaptchaVerifier.clear()
+            } catch (clearErr) {
+                console.log("Phone reCAPTCHA clear error:", clearErr)
+            }
+            phoneRecaptchaVerifier = null
+            phoneRecaptchaMode = ""
+        }
+
+        const code = String(err?.code || "")
+        const message = code === "auth/operation-not-allowed"
+            ? "Phone provider is disabled in Firebase Authentication settings."
+            : code === "auth/too-many-requests"
+                ? "Too many OTP attempts. Please wait a bit and try again."
+                : code === "auth/unauthorized-domain"
+                    ? "Add this domain in Firebase Authentication authorized domains."
+                    : `Unable to send OTP right now${code ? ` (${code})` : ""}. Please check the number and try again.`
+
+        setPhoneStatus(normalizedMode, message, "error")
+    } finally {
+        elements.sendBtn.disabled = false
+    }
+}
+
+window.verifyPhoneOtp = async function (mode = "login") {
+    const normalizedMode = mode === "signup" ? "signup" : "login"
+    const elements = phoneAuthElements(normalizedMode)
+    const code = String(elements.otpInput?.value || "").replace(/\D/g, "")
+    const confirmation = phoneConfirmations[normalizedMode]
+
+    if (!confirmation) {
+        setPhoneStatus(normalizedMode, "Send an OTP first.", "error")
+        return
+    }
+
+    if (!code) {
+        setPhoneStatus(normalizedMode, "Enter the OTP code.", "error")
+        elements.otpInput?.focus()
+        return
+    }
+
+    try {
+        elements.verifyBtn.disabled = true
+        setPhoneStatus(normalizedMode, "Verifying OTP...", "")
+        const result = await confirmation.confirm(code)
+        await completePhoneLogin(result.user, normalizedMode)
+    } catch (err) {
+        console.error("Phone OTP verify error:", err)
+        const codeName = String(err?.code || "")
+        const message = codeName === "auth/invalid-verification-code"
+            ? "That OTP is not correct. Please check it and try again."
+            : (err?.message || "OTP verification failed. Please try again.")
+        setPhoneStatus(normalizedMode, message, "error")
+    } finally {
+        elements.verifyBtn.disabled = false
     }
 }
 

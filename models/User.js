@@ -20,9 +20,38 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
+    phone: {
+        type: String,
+        default: "",
+        trim: true
+    },
+    stylePreference: {
+        type: String,
+        default: "",
+        trim: true
+    },
+    fitPreference: {
+        type: String,
+        default: "",
+        trim: true
+    },
+    wantsUpdates: {
+        type: Boolean,
+        default: true
+    },
     provider: {
         type: String,
         default: "email"
+    }
+    ,
+    wishlist: {
+        type: [
+            {
+                type: require("mongoose").Schema.Types.ObjectId,
+                ref: "Product"
+            }
+        ],
+        default: []
     }
 }, { timestamps: true })
 
