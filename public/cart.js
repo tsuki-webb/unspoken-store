@@ -1,6 +1,5 @@
 (function cartPageBootstrap() {
     const INR_SYMBOL = String.fromCharCode(8377)
-    const TAX_RATE = 0.05
     const CHECKOUT_STORAGE_KEY = "luxoraCheckoutProfileV1"
     const ALLOWED_PAYMENT_METHODS = new Set(["cod", "upi", "card", "netbanking"])
     const DEFAULT_CHECKOUT_OPTIONS = {
@@ -26,7 +25,6 @@
         summaryItems: document.getElementById("summaryItems"),
         summarySubtotal: document.getElementById("summarySubtotal"),
         summaryShipping: document.getElementById("summaryShipping"),
-        summaryTax: document.getElementById("summaryTax"),
         summaryGrandTotal: document.getElementById("summaryGrandTotal"),
         shippingHint: document.getElementById("shippingHint"),
         shippingProgressValue: document.getElementById("shippingProgressValue"),
@@ -45,7 +43,6 @@
         checkoutReviewItems: document.getElementById("checkoutReviewItems"),
         checkoutReviewSubtotal: document.getElementById("checkoutReviewSubtotal"),
         checkoutReviewShipping: document.getElementById("checkoutReviewShipping"),
-        checkoutReviewTax: document.getElementById("checkoutReviewTax"),
         checkoutReviewTotal: document.getElementById("checkoutReviewTotal"),
         checkoutCustomerName: document.getElementById("checkoutCustomerName"),
         checkoutCustomerPhone: document.getElementById("checkoutCustomerPhone"),
@@ -190,14 +187,16 @@
     }
 
     function renderSummary(cart) {
+        const subtotal = Number(cart?.subtotal || 0)
+        const shipping = Number(cart?.shipping || 0)
+        const grandTotal = subtotal + shipping
+
         setText(dom.summaryItems, String(cart?.itemCount || 0))
-        setText(dom.summarySubtotal, formatCurrency(cart?.subtotal || 0))
-        setText(dom.summaryShipping, formatCurrency(cart?.shipping || 0))
-        setText(dom.summaryTax, formatCurrency(cart?.tax || 0))
-        setText(dom.summaryGrandTotal, formatCurrency(cart?.grandTotal || 0))
+        setText(dom.summarySubtotal, formatCurrency(subtotal))
+        setText(dom.summaryShipping, formatCurrency(shipping))
+        setText(dom.summaryGrandTotal, formatCurrency(grandTotal))
 
         const freeThreshold = Number(cart?.freeShippingThreshold || 1999)
-        const subtotal = Number(cart?.subtotal || 0)
         const remaining = Math.max(freeThreshold - subtotal, 0)
 
         const progress = freeThreshold > 0
@@ -230,11 +229,10 @@
         }
 
         const itemCount = Number(cart?.itemCount || 0)
-        const taxRateLabel = Math.round(TAX_RATE * 100)
 
         dom.infoBanner.classList.remove("hidden")
         setHtml(dom.infoBanner, itemCount
-            ? `Cart synced for <b>${escapeHtml(userEmail)}</b>. Taxes are estimated at ${taxRateLabel}% until checkout.`
+            ? `Cart synced for <b>${escapeHtml(userEmail)}</b>. No tax is applied to this order.`
             : `Your cart is saved for <b>${escapeHtml(userEmail)}</b>. Start adding your favorite products.`)
     }
 
@@ -338,11 +336,14 @@
             }
         }
 
+        const subtotal = Number(state.cart?.subtotal || 0)
+        const shipping = Number(state.cart?.shipping || 0)
+        const grandTotal = subtotal + shipping
+
         if (dom.checkoutReviewItems) setText(dom.checkoutReviewItems, String(state.cart?.itemCount || 0))
-        if (dom.checkoutReviewSubtotal) setText(dom.checkoutReviewSubtotal, formatCurrency(state.cart?.subtotal || 0))
-        if (dom.checkoutReviewShipping) setText(dom.checkoutReviewShipping, formatCurrency(state.cart?.shipping || 0))
-        if (dom.checkoutReviewTax) setText(dom.checkoutReviewTax, formatCurrency(state.cart?.tax || 0))
-        if (dom.checkoutReviewTotal) setText(dom.checkoutReviewTotal, formatCurrency(state.cart?.grandTotal || 0))
+        if (dom.checkoutReviewSubtotal) setText(dom.checkoutReviewSubtotal, formatCurrency(subtotal))
+        if (dom.checkoutReviewShipping) setText(dom.checkoutReviewShipping, formatCurrency(shipping))
+        if (dom.checkoutReviewTotal) setText(dom.checkoutReviewTotal, formatCurrency(grandTotal))
     }
 
     function syncUi() {

@@ -25,6 +25,7 @@ app.use(cors({
 }))
 app.use("/api/orders/razorpay/webhook", express.raw({ type: "application/json" }))
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
 // ✅ API ROUTES
 app.use("/api/products", productRoutes)

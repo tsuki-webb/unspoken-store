@@ -89,10 +89,15 @@ function getProductImage(product) {
 
 function calculateSummary(items) {
     const subtotal = items.reduce((sum, item) => sum + Number(item.lineTotal || 0), 0)
+    const deliveryCharge = items.reduce((sum, item) => {
+        const enabled = item?.deliveryChargeEnabled !== false
+        const amount = Number(item?.deliveryChargeAmount || 0)
+        return sum + (enabled && subtotal > 0 ? amount : 0)
+    }, 0)
     const shipping = subtotal >= FREE_SHIPPING_THRESHOLD
         ? 0
-        : (subtotal > 0 ? FLAT_SHIPPING_FEE : 0)
-    const tax = subtotal > 0 ? Number((subtotal * TAX_RATE).toFixed(2)) : 0
+        : (subtotal > 0 ? deliveryCharge : 0)
+    const tax = 0
     const grandTotal = Number((subtotal + shipping + tax).toFixed(2))
     const remainingForFreeShipping = subtotal >= FREE_SHIPPING_THRESHOLD
         ? 0
@@ -104,7 +109,7 @@ function calculateSummary(items) {
         subtotal: Number(subtotal.toFixed(2)),
         shipping,
         tax,
-        taxRate: TAX_RATE,
+        taxRate: 0,
         grandTotal,
         freeShippingThreshold: FREE_SHIPPING_THRESHOLD,
         remainingForFreeShipping
@@ -316,6 +321,8 @@ function formatCartItems(cartDoc) {
                 gender: String(customPreset.targetGender || ""),
                 type: "tshirt",
                 fit,
+                deliveryChargeEnabled: false,
+                deliveryChargeAmount: 0,
                 customPreset
             }
         }
@@ -334,6 +341,8 @@ function formatCartItems(cartDoc) {
             gender: String(productDoc?.gender || ""),
             type: String(productDoc?.type || ""),
             fit: String(productDoc?.fit || ""),
+            deliveryChargeEnabled: productDoc?.deliveryChargeEnabled !== false,
+            deliveryChargeAmount: Number(productDoc?.deliveryChargeAmount || 0),
             customPreset: null
         }
     })
@@ -342,7 +351,7 @@ function formatCartItems(cartDoc) {
 async function getHydratedCart(userEmail) {
     return Cart.findOne({ userEmail }).populate(
         "items.product",
-        "name price images image gender type fit"
+        "name price images image gender type fit deliveryChargeEnabled deliveryChargeAmount"
     )
 }
 

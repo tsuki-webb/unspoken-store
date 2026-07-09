@@ -544,6 +544,13 @@ function switchPanel(panelId, btn = null, options = {}) {
         updatePanelHash(normalizedPanelId)
     }
 
+    loadDashboard()
+
+    if (normalizedPanelId === "products") {
+        loadProducts()
+        return
+    }
+
     if (normalizedPanelId === "banners") {
         loadBanners()
         return
@@ -619,6 +626,7 @@ async function addProduct() {
 
     const featured = document.getElementById("featured").checked
     const newCollection = document.getElementById("newCollection").checked
+    const deliveryChargeEnabled = document.getElementById("deliveryChargeEnabled").checked
     const files = document.getElementById("images").files
 
     if (!name || !price) {
@@ -668,6 +676,8 @@ async function addProduct() {
 
         formData.append("featured", featured)
         formData.append("newCollection", newCollection)
+        formData.append("deliveryChargeEnabled", deliveryChargeEnabled)
+        formData.append("deliveryChargeAmount", deliveryChargeEnabled ? "99" : "0")
 
         for (const file of files) {
             const compressedFile = await compressImage(file)
@@ -1117,6 +1127,7 @@ async function openPopup(id) {
     document.getElementById("editFit").value = p.fit || ""
     document.getElementById("editFeatured").checked = isEnabledFlag(p.featured)
     document.getElementById("editNewCollection").checked = isEnabledFlag(p.newCollection)
+    document.getElementById("editDeliveryChargeEnabled").checked = p.deliveryChargeEnabled !== false
     updateFitState("editType", "editFit")
 
     document.getElementById("editMaterial").value = p.material || ""
@@ -1212,6 +1223,7 @@ async function saveEdit() {
     const fit = document.getElementById("editFit").value
     const desiredFeatured = document.getElementById("editFeatured").checked
     const desiredNewCollection = document.getElementById("editNewCollection").checked
+    const desiredDeliveryChargeEnabled = document.getElementById("editDeliveryChargeEnabled").checked
 
     if (requiresFit(type) && !fit) {
         alert("Select fit for T-Shirts")
@@ -1226,6 +1238,8 @@ async function saveEdit() {
     formData.append("type", type)
     formData.append("featured", desiredFeatured ? "true" : "false")
     formData.append("newCollection", desiredNewCollection ? "true" : "false")
+    formData.append("deliveryChargeEnabled", desiredDeliveryChargeEnabled ? "true" : "false")
+    formData.append("deliveryChargeAmount", desiredDeliveryChargeEnabled ? "99" : "0")
 
     if (requiresFit(type)) {
         formData.append("fit", fit)
@@ -2290,7 +2304,6 @@ function renderOrderCards(rows) {
                     <p><strong>Items:</strong> ${escapeHtml(String(itemCount))}</p>
                     <p><strong>Subtotal:</strong> ${escapeHtml(subtotal)}</p>
                     <p><strong>Shipping:</strong> ${escapeHtml(shipping)}</p>
-                    <p><strong>Tax:</strong> ${escapeHtml(tax)}</p>
                     <p><strong>Total:</strong> ${escapeHtml(grandTotal)}</p>
                     <p><strong>Payment:</strong> ${escapeHtml(paymentMethod)}</p>
                     <p><strong>Pay Status:</strong> ${escapeHtml(paymentStatus)}</p>

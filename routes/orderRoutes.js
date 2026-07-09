@@ -305,10 +305,15 @@ async function requireUserEmail(req, res) {
 
 function calculateSummary(items) {
     const subtotal = items.reduce((sum, item) => sum + Number(item.lineTotal || 0), 0)
+    const deliveryCharge = items.reduce((sum, item) => {
+        const enabled = item?.deliveryChargeEnabled !== false
+        const amount = Number(item?.deliveryChargeAmount || 0)
+        return sum + (enabled && subtotal > 0 ? amount : 0)
+    }, 0)
     const shipping = subtotal >= FREE_SHIPPING_THRESHOLD
         ? 0
-        : (subtotal > 0 ? FLAT_SHIPPING_FEE : 0)
-    const tax = subtotal > 0 ? Number((subtotal * TAX_RATE).toFixed(2)) : 0
+        : (subtotal > 0 ? deliveryCharge : 0)
+    const tax = 0
     const grandTotal = Number((subtotal + shipping + tax).toFixed(2))
 
     return {
@@ -317,7 +322,7 @@ function calculateSummary(items) {
         subtotal: Number(subtotal.toFixed(2)),
         shipping,
         tax,
-        taxRate: TAX_RATE,
+        taxRate: 0,
         grandTotal,
         freeShippingThreshold: FREE_SHIPPING_THRESHOLD
     }
@@ -369,6 +374,8 @@ function formatCartItemsForOrder(cartDoc) {
                 gender: String(customPreset.targetGender || ""),
                 type: "tshirt",
                 fit: String(customPreset.tshirtFit || ""),
+                deliveryChargeEnabled: false,
+                deliveryChargeAmount: 0,
                 customPreset
             }
         }
@@ -385,6 +392,8 @@ function formatCartItemsForOrder(cartDoc) {
             gender: String(productDoc?.gender || ""),
             type: String(productDoc?.type || ""),
             fit: String(productDoc?.fit || ""),
+            deliveryChargeEnabled: productDoc?.deliveryChargeEnabled !== false,
+            deliveryChargeAmount: Number(productDoc?.deliveryChargeAmount || 0),
             customPreset: null
         }
     })
@@ -730,7 +739,7 @@ async function createOrderFromCart({
 
     const cart = await Cart.findOne({ userEmail }).populate(
         "items.product",
-        "name price images image gender type fit"
+        "name price images image gender type fit deliveryChargeEnabled deliveryChargeAmount"
     )
 
     if (!cart || !Array.isArray(cart.items) || !cart.items.length) {
@@ -787,7 +796,7 @@ async function createOrderFromCart({
         await cart.save()
         updatedCart = await Cart.findOne({ userEmail }).populate(
             "items.product",
-            "name price images image gender type fit"
+            "name price images image gender type fit deliveryChargeEnabled deliveryChargeAmount"
         )
     }
 
@@ -976,7 +985,7 @@ router.post("/:orderId/payment/confirm", async (req, res) => {
 
         const refreshedCart = await Cart.findOne({ userEmail }).populate(
             "items.product",
-            "name price images image gender type fit"
+            "name price images image gender type fit deliveryChargeEnabled deliveryChargeAmount"
         )
 
         res.json({

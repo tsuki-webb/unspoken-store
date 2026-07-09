@@ -399,7 +399,6 @@ function renderOrderCards(rows) {
                     <p><strong>Items:</strong> ${escapeHtml(String(itemCount))}</p>
                     <p><strong>Subtotal:</strong> ${escapeHtml(subtotal)}</p>
                     <p><strong>Shipping:</strong> ${escapeHtml(shipping)}</p>
-                    <p><strong>Tax:</strong> ${escapeHtml(tax)}</p>
                     <p><strong>Total:</strong> ${escapeHtml(grandTotal)}</p>
                     <p><strong>Payment:</strong> ${escapeHtml(paymentMethod)}</p>
                     <p><strong>Pay Status:</strong> ${escapeHtml(paymentStatus)}</p>

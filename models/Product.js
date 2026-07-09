@@ -41,7 +41,9 @@ const productSchema = new mongoose.Schema({
 
     featured: { type: Boolean, default: false },
     newCollection: { type: Boolean, default: false },
-    newCollectionPriority: { type: Number, default: null }
+    newCollectionPriority: { type: Number, default: null },
+    deliveryChargeEnabled: { type: Boolean, default: true },
+    deliveryChargeAmount: { type: Number, default: 99 }
 
 }, { timestamps: true })
 

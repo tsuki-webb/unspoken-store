@@ -55,6 +55,10 @@ function normalizePriority(value, fallback = null) {
     return parsed
 }
 
+function getRequestBody(req) {
+    return req?.body && typeof req.body === "object" ? req.body : {}
+}
+
 async function getNextNewCollectionPriority(excludeProductId = null) {
     const query = { newCollection: true }
 
@@ -190,6 +194,7 @@ router.get("/", async (req, res) => {
 // CREATE product with up to 5 images
 router.post("/", upload.array("images", 5), async (req, res) => {
     try {
+        const requestBody = getRequestBody(req)
         const {
             name,
             price,
@@ -198,8 +203,10 @@ router.post("/", upload.array("images", 5), async (req, res) => {
             fit,
             featured,
             newCollection,
-            newCollectionPriority
-        } = req.body
+            newCollectionPriority,
+            deliveryChargeEnabled,
+            deliveryChargeAmount
+        } = requestBody
 
         if (!name || !price) {
             return res.status(400).json({ error: "Name and price are required" })
@@ -228,6 +235,11 @@ router.post("/", upload.array("images", 5), async (req, res) => {
                 normalizePriority(newCollectionPriority, null) || await getNextNewCollectionPriority()
         }
 
+        const shouldChargeDelivery = normalizeBoolean(deliveryChargeEnabled, true)
+        const resolvedDeliveryChargeAmount = shouldChargeDelivery
+            ? (normalizePriority(deliveryChargeAmount, 99) || 99)
+            : 0
+
         const product = new Product({
             name,
             price,
@@ -237,7 +249,9 @@ router.post("/", upload.array("images", 5), async (req, res) => {
             ...(normalizedCategory.fit ? { fit: normalizedCategory.fit } : {}),
             featured: normalizeBoolean(featured, false),
             newCollection: shouldBeInNewCollection,
-            newCollectionPriority: resolvedNewCollectionPriority
+            newCollectionPriority: resolvedNewCollectionPriority,
+            deliveryChargeEnabled: shouldChargeDelivery,
+            deliveryChargeAmount: resolvedDeliveryChargeAmount
         })
 
         await product.save()
@@ -269,6 +283,7 @@ router.put("/:id", upload.array("newImages", 5), async (req, res) => {
             return res.status(404).json({ error: "Product not found" })
         }
 
+        const requestBody = getRequestBody(req)
         const {
             existingImages,
             gender,
@@ -285,8 +300,10 @@ router.put("/:id", upload.array("newImages", 5), async (req, res) => {
             customerCare,
             countryOfOrigin,
             description,
-            artistDetails
-        } = req.body
+            artistDetails,
+            deliveryChargeEnabled,
+            deliveryChargeAmount
+        } = requestBody
 
         const normalizedCategory = normalizeCategory(
             gender || existingProduct.gender,
@@ -335,6 +352,11 @@ router.put("/:id", upload.array("newImages", 5), async (req, res) => {
             }
         }
 
+        const shouldChargeDelivery = normalizeBoolean(deliveryChargeEnabled, existingProduct.deliveryChargeEnabled)
+        const resolvedDeliveryChargeAmount = shouldChargeDelivery
+            ? (normalizePriority(deliveryChargeAmount, existingProduct.deliveryChargeAmount || 99) || 99)
+            : 0
+
         const updatePayload = {
             name,
             price,
@@ -344,6 +366,8 @@ router.put("/:id", upload.array("newImages", 5), async (req, res) => {
             featured: normalizeBoolean(featured, existingProduct.featured),
             newCollection: shouldBeInNewCollection,
             newCollectionPriority: resolvedNewCollectionPriority,
+            deliveryChargeEnabled: shouldChargeDelivery,
+            deliveryChargeAmount: resolvedDeliveryChargeAmount,
             material,
             care,
             manufacturedBy,
