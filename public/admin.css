@@ -1595,6 +1595,60 @@ h3{
     grid-template-columns: 76px minmax(140px, 1fr) minmax(160px, 1fr) auto;
 }
 
+.footer-icon-row.footer-social-row {
+    grid-template-columns: 78px minmax(140px, 1fr) minmax(180px, 1fr) 160px 96px auto;
+    align-items: start;
+    gap: 12px;
+}
+
+.footer-social-upload-cell {
+    display: grid;
+    gap: 8px;
+}
+
+.footer-upload-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 48px;
+    padding: 0 12px;
+    border: 1px dashed rgba(17, 17, 17, 0.24);
+    border-radius: 12px;
+    background: #fff;
+    color: #222;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.footer-upload-chip input {
+    display: none;
+}
+
+.footer-social-preview-wrap {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(17, 17, 17, 0.12);
+    border-radius: 12px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.footer-social-preview {
+    width: 100%;
+    height: 48px;
+    object-fit: cover;
+}
+
+.footer-social-preview-placeholder {
+    color: #777;
+    font-size: 12px;
+    font-weight: 800;
+}
+
 .footer-small-action {
     width: fit-content;
     margin-top: 12px;

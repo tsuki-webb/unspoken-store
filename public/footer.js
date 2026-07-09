@@ -76,7 +76,7 @@
     }
 
     function asArray(value, fallback) {
-        return Array.isArray(value) && value.length ? value : fallback
+        return Array.isArray(value) ? value : fallback
     }
 
     function mergeFooter(settings) {
@@ -117,21 +117,18 @@
         }).join("")
     }
 
-    function renderAppButtons(buttons) {
-        return buttons.map(button => `
-            <a class="site-footer-app-btn" href="${escapeHtml(safeHref(button.href))}">
-                <span>${escapeHtml(button.badge || "Download")}</span>
-                <strong>${escapeHtml(button.label)}</strong>
-            </a>
-        `).join("")
-    }
-
     function renderSocials(links) {
-        return links.map(link => `
-            <a class="site-footer-social-link" href="${escapeHtml(safeHref(link.href))}" aria-label="${escapeHtml(link.label)}">
-                ${escapeHtml(link.icon || String(link.label || "?").slice(0, 2))}
-            </a>
-        `).join("")
+        return links.map(link => {
+            const imageMarkup = link.imageUrl
+                ? `<img src="${escapeHtml(link.imageUrl)}" alt="${escapeHtml(link.label || "Social link")}">`
+                : `<span>${escapeHtml(link.icon || String(link.label || "?").slice(0, 2))}</span>`
+
+            return `
+                <a class="site-footer-social-link" href="${escapeHtml(safeHref(link.href))}" aria-label="${escapeHtml(link.label)}">
+                    ${imageMarkup}
+                </a>
+            `
+        }).join("")
     }
 
     function renderPills(items) {
@@ -163,11 +160,7 @@
                         ${renderLinkSections(footer.linkSections)}
                     </div>
 
-                    <section class="site-footer-app-social" aria-label="App and social links">
-                        <div>
-                            <h3>${escapeHtml(footer.appTitle)}</h3>
-                            <div class="site-footer-app-buttons">${renderAppButtons(footer.appButtons)}</div>
-                        </div>
+                    <section class="site-footer-app-social" aria-label="Social links">
                         <div class="site-footer-social-row">
                             <span>Follow Us:</span>
                             ${renderSocials(footer.socialLinks)}
@@ -194,7 +187,7 @@
 
     async function loadFooter() {
         try {
-            const response = await fetch("/api/footer")
+            const response = await fetch("/api/footer", { cache: "no-store" })
             if (!response.ok) throw new Error("Footer request failed")
             return await response.json()
         } catch (err) {
@@ -221,4 +214,10 @@
     } else {
         initFooter()
     }
+
+    window.addEventListener("storage", event => {
+        if (event.key === "unspoken_footer_refresh") {
+            initFooter()
+        }
+    })
 })()

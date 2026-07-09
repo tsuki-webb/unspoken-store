@@ -2472,12 +2472,12 @@ function mergeFooterSettings(settings = {}) {
     return {
         ...DEFAULT_FOOTER_SETTINGS,
         ...data,
-        linkSections: Array.isArray(data.linkSections) && data.linkSections.length ? data.linkSections : DEFAULT_FOOTER_SETTINGS.linkSections,
-        featureRows: Array.isArray(data.featureRows) && data.featureRows.length ? data.featureRows : DEFAULT_FOOTER_SETTINGS.featureRows,
-        appButtons: Array.isArray(data.appButtons) && data.appButtons.length ? data.appButtons : DEFAULT_FOOTER_SETTINGS.appButtons,
-        socialLinks: Array.isArray(data.socialLinks) && data.socialLinks.length ? data.socialLinks : DEFAULT_FOOTER_SETTINGS.socialLinks,
-        paymentItems: Array.isArray(data.paymentItems) && data.paymentItems.length ? data.paymentItems : DEFAULT_FOOTER_SETTINGS.paymentItems,
-        shippingItems: Array.isArray(data.shippingItems) && data.shippingItems.length ? data.shippingItems : DEFAULT_FOOTER_SETTINGS.shippingItems
+        linkSections: Array.isArray(data.linkSections) ? data.linkSections : DEFAULT_FOOTER_SETTINGS.linkSections,
+        featureRows: Array.isArray(data.featureRows) ? data.featureRows : DEFAULT_FOOTER_SETTINGS.featureRows,
+        appButtons: Array.isArray(data.appButtons) ? data.appButtons : DEFAULT_FOOTER_SETTINGS.appButtons,
+        socialLinks: Array.isArray(data.socialLinks) ? data.socialLinks : DEFAULT_FOOTER_SETTINGS.socialLinks,
+        paymentItems: Array.isArray(data.paymentItems) ? data.paymentItems : DEFAULT_FOOTER_SETTINGS.paymentItems,
+        shippingItems: Array.isArray(data.shippingItems) ? data.shippingItems : DEFAULT_FOOTER_SETTINGS.shippingItems
     }
 }
 
@@ -2504,9 +2504,9 @@ function renderFooterSectionsEditor(sections = []) {
     const container = document.getElementById("footerSectionsEditor")
     if (!container) return
 
-    const normalized = Array.isArray(sections) && sections.length ? sections : [{ title: "", items: [] }]
+    const normalized = Array.isArray(sections) ? sections : []
     container.innerHTML = normalized.map((section, sectionIndex) => {
-        const items = Array.isArray(section.items) && section.items.length ? section.items : [{ label: "", href: "" }]
+        const items = Array.isArray(section.items) ? section.items : []
         return `
             <article class="footer-edit-block" data-footer-section>
                 <div class="footer-edit-block-head">
@@ -2539,30 +2539,72 @@ function renderIconEditor(containerId, rows = [], type = "feature") {
     const container = document.getElementById(containerId)
     if (!container) return
 
-    const normalized = Array.isArray(rows) && rows.length ? rows : [{ icon: "", label: "", href: "" }]
-    container.innerHTML = normalized.map(row => `
-        <div class="footer-icon-row" data-footer-${type}-row>
-            <input type="text" data-footer-icon value="${escapeHtml(row.icon || "")}" placeholder="Icon">
-            <input type="text" data-footer-label value="${escapeHtml(row.label || "")}" placeholder="Label">
-            <input type="text" data-footer-href value="${escapeHtml(row.href || "")}" placeholder="Link (optional)">
-            <button type="button" onclick="removeFooterEditorBlock(this)">Remove</button>
-        </div>
-    `).join("")
-}
+    const normalized = Array.isArray(rows) ? rows : []
+    container.innerHTML = normalized.map(row => {
+        const socialUploadMarkup = type === "social"
+            ? `
+                <div class="footer-social-upload-cell">
+                    <label class="footer-upload-chip">
+                        <span>Upload logo</span>
+                        <input type="file" accept="image/*" data-footer-social-upload>
+                    </label>
+                    <input type="hidden" data-footer-social-image-url value="${escapeHtml(row.imageUrl || "")}">
+                </div>
+                <div class="footer-social-preview-wrap">
+                    ${row.imageUrl
+                        ? `<img class="footer-social-preview" data-footer-social-preview src="${escapeHtml(row.imageUrl)}" alt="">`
+                        : `<span class="footer-social-preview-placeholder">No logo</span>`}
+                </div>
+            `
+            : ""
 
-function renderAppButtonsEditor(buttons = []) {
-    const container = document.getElementById("footerAppButtonsEditor")
-    if (!container) return
+        return `
+            <div class="footer-icon-row${type === "social" ? " footer-social-row" : ""}" data-footer-${type}-row>
+                <input type="text" data-footer-icon value="${escapeHtml(row.icon || "")}" placeholder="Icon">
+                <input type="text" data-footer-label value="${escapeHtml(row.label || "")}" placeholder="Label">
+                <input type="text" data-footer-href value="${escapeHtml(row.href || "")}" placeholder="Link (optional)">
+                ${socialUploadMarkup}
+                <button type="button" onclick="removeFooterEditorBlock(this)">Remove</button>
+            </div>
+        `
+    }).join("")
 
-    const normalized = Array.isArray(buttons) && buttons.length ? buttons : [{ badge: "", label: "", href: "" }]
-    container.innerHTML = normalized.map(button => `
-        <div class="footer-icon-row" data-footer-app-row>
-            <input type="text" data-footer-app-badge value="${escapeHtml(button.badge || "")}" placeholder="Badge">
-            <input type="text" data-footer-app-label value="${escapeHtml(button.label || "")}" placeholder="App name">
-            <input type="text" data-footer-app-href value="${escapeHtml(button.href || "")}" placeholder="Link">
-            <button type="button" onclick="removeFooterEditorBlock(this)">Remove</button>
-        </div>
-    `).join("")
+    if (type === "social") {
+        requestAnimationFrame(() => {
+            container.querySelectorAll("[data-footer-social-upload]").forEach(input => {
+                input.addEventListener("change", async () => {
+                    const row = input.closest("[data-footer-social-row]")
+                    const hidden = row?.querySelector("[data-footer-social-image-url]")
+                    const preview = row?.querySelector("[data-footer-social-preview]")
+                    const placeholder = row?.querySelector(".footer-social-preview-placeholder")
+
+                    if (!input.files?.[0] || !hidden || !preview) return
+
+                    try {
+                        const formData = new FormData()
+                        formData.append("image", input.files[0])
+
+                        const response = await fetch("/api/footer/social-icon", {
+                            method: "POST",
+                            body: formData
+                        })
+                        const payload = await response.json().catch(() => ({}))
+
+                        if (!response.ok) {
+                            throw new Error(payload?.error || "Unable to upload social logo")
+                        }
+
+                        hidden.value = payload.url || ""
+                        preview.src = payload.url || ""
+                        preview.hidden = false
+                        if (placeholder) placeholder.remove()
+                    } catch (err) {
+                        alert(err?.message || "Unable to upload social logo")
+                    }
+                })
+            })
+        })
+    }
 }
 
 function hydrateFooterForm(settings) {
@@ -2586,7 +2628,6 @@ function hydrateFooterForm(settings) {
 
     renderFooterSectionsEditor(footer.linkSections)
     renderIconEditor("footerFeaturesEditor", footer.featureRows, "feature")
-    renderAppButtonsEditor(footer.appButtons)
     renderIconEditor("footerSocialsEditor", footer.socialLinks, "social")
 }
 
@@ -2606,15 +2647,8 @@ function collectFooterIconRows(selector) {
     return Array.from(document.querySelectorAll(selector)).map(row => ({
         icon: normalizeText(row.querySelector("[data-footer-icon]")?.value),
         label: normalizeText(row.querySelector("[data-footer-label]")?.value),
-        href: normalizeText(row.querySelector("[data-footer-href]")?.value)
-    })).filter(item => item.label)
-}
-
-function collectFooterAppButtons() {
-    return Array.from(document.querySelectorAll("[data-footer-app-row]")).map(row => ({
-        badge: normalizeText(row.querySelector("[data-footer-app-badge]")?.value),
-        label: normalizeText(row.querySelector("[data-footer-app-label]")?.value),
-        href: normalizeText(row.querySelector("[data-footer-app-href]")?.value) || "#"
+        href: normalizeText(row.querySelector("[data-footer-href]")?.value),
+        imageUrl: normalizeText(row.querySelector("[data-footer-social-image-url]")?.value)
     })).filter(item => item.label)
 }
 
@@ -2629,7 +2663,7 @@ function collectFooterPayload() {
         linkSections: collectFooterSections(),
         featureRows: collectFooterIconRows("[data-footer-feature-row]"),
         appTitle: normalizeText(document.getElementById("footerAppTitle")?.value),
-        appButtons: collectFooterAppButtons(),
+        appButtons: [],
         socialLinks: collectFooterIconRows("[data-footer-social-row]"),
         infoTitle: normalizeText(document.getElementById("footerInfoTitle")?.value),
         infoBody: normalizeText(document.getElementById("footerInfoBody")?.value),
@@ -2659,12 +2693,6 @@ function addFooterFeature() {
     renderIconEditor("footerFeaturesEditor", rows, "feature")
 }
 
-function addFooterAppButton() {
-    const rows = collectFooterAppButtons()
-    rows.push({ badge: "", label: "", href: "" })
-    renderAppButtonsEditor(rows)
-}
-
 function addFooterSocial() {
     const rows = collectFooterIconRows("[data-footer-social-row]")
     rows.push({ icon: "", label: "", href: "" })
@@ -2672,7 +2700,7 @@ function addFooterSocial() {
 }
 
 function removeFooterEditorBlock(button) {
-    const block = button?.closest("[data-footer-section], [data-footer-link-row], [data-footer-feature-row], [data-footer-app-row], [data-footer-social-row]")
+    const block = button?.closest("[data-footer-section], [data-footer-link-row], [data-footer-feature-row], [data-footer-social-row]")
     if (block) block.remove()
 }
 
@@ -2719,6 +2747,11 @@ async function saveFooterSettings() {
         }
 
         hydrateFooterForm(saved)
+        try {
+            localStorage.setItem("unspoken_footer_refresh", String(Date.now()))
+        } catch (err) {
+            // noop: storefront will still load the saved footer on refresh
+        }
         setFooterFeedback("Footer saved. Storefront pages will use the updated content.", "success")
     } catch (err) {
         console.log("Footer settings save error:", err)

@@ -2,6 +2,9 @@ const express = require("express")
 const router = express.Router()
 
 const FooterSettings = require("../models/FooterSettings")
+const upload = require("../middleware/upload")
+const cloudinary = require("../config/cloudinary")
+const streamifier = require("streamifier")
 
 const DEFAULT_FOOTER = {
     homegrownText: "HOMEGROWN INDIAN BRAND",
@@ -94,7 +97,8 @@ function sanitizeIconRows(items) {
         .map(item => ({
             label: normalizeText(item?.label),
             href: normalizeText(item?.href),
-            icon: normalizeText(item?.icon)
+            icon: normalizeText(item?.icon),
+            imageUrl: normalizeText(item?.imageUrl)
         }))
         .filter(item => item.label)
         .slice(0, 8)
@@ -146,17 +150,45 @@ function mergeWithDefaults(settings) {
     return {
         ...DEFAULT_FOOTER,
         ...(raw || {}),
-        linkSections: raw?.linkSections?.length ? raw.linkSections : DEFAULT_FOOTER.linkSections,
-        featureRows: raw?.featureRows?.length ? raw.featureRows : DEFAULT_FOOTER.featureRows,
-        appButtons: raw?.appButtons?.length ? raw.appButtons : DEFAULT_FOOTER.appButtons,
-        socialLinks: raw?.socialLinks?.length ? raw.socialLinks : DEFAULT_FOOTER.socialLinks,
-        paymentItems: raw?.paymentItems?.length ? raw.paymentItems : DEFAULT_FOOTER.paymentItems,
-        shippingItems: raw?.shippingItems?.length ? raw.shippingItems : DEFAULT_FOOTER.shippingItems
+        linkSections: Array.isArray(raw?.linkSections) ? raw.linkSections : DEFAULT_FOOTER.linkSections,
+        featureRows: Array.isArray(raw?.featureRows) ? raw.featureRows : DEFAULT_FOOTER.featureRows,
+        appButtons: Array.isArray(raw?.appButtons) ? raw.appButtons : DEFAULT_FOOTER.appButtons,
+        socialLinks: Array.isArray(raw?.socialLinks) ? raw.socialLinks : DEFAULT_FOOTER.socialLinks,
+        paymentItems: Array.isArray(raw?.paymentItems) ? raw.paymentItems : DEFAULT_FOOTER.paymentItems,
+        shippingItems: Array.isArray(raw?.shippingItems) ? raw.shippingItems : DEFAULT_FOOTER.shippingItems
     }
 }
 
+function uploadToCloudinary(fileBuffer, folder = "luxora-footer-socials") {
+    return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+            { folder, resource_type: "image" },
+            (error, result) => {
+                if (error) return reject(error)
+                resolve(result)
+            }
+        )
+        streamifier.createReadStream(fileBuffer).pipe(stream)
+    })
+}
+
+router.post("/social-icon", upload.single("image"), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: "No image uploaded" })
+        }
+
+        const result = await uploadToCloudinary(req.file.buffer)
+        res.json({ url: result.secure_url })
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({ error: err.message })
+    }
+})
+
 router.get("/", async (req, res) => {
     try {
+        res.set("Cache-Control", "no-store")
         const settings = await FooterSettings.findOne({ singletonKey: "site-footer" })
         res.json(mergeWithDefaults(settings))
     } catch (err) {
@@ -167,6 +199,7 @@ router.get("/", async (req, res) => {
 
 router.put("/", async (req, res) => {
     try {
+        res.set("Cache-Control", "no-store")
         const payload = sanitizePayload(req.body)
         const settings = await FooterSettings.findOneAndUpdate(
             { singletonKey: "site-footer" },
