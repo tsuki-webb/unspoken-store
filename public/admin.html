@@ -29,6 +29,7 @@
             <button class="nav-btn" data-panel="products" onclick="switchPanel('products', this)">Products</button>
             <button class="nav-btn" data-panel="banners" onclick="switchPanel('banners', this)">Banners</button>
             <button class="nav-btn" data-panel="categorycards" onclick="switchPanel('categorycards', this)">Category Cards</button>
+            <button class="nav-btn" data-panel="footer" onclick="switchPanel('footer', this)">Footer</button>
             <button class="nav-btn" data-panel="customdesigns" onclick="switchPanel('customdesigns', this)">Custom Designs</button>
             <button class="nav-btn" data-panel="orders" onclick="switchPanel('orders', this)">Orders</button>
             <button class="nav-btn" data-panel="users" onclick="switchPanel('users', this)">Users</button>
@@ -202,6 +203,136 @@
 
             <h2>Current Category Cards</h2>
             <div id="categoryCardList" class="category-card-admin-grid"></div>
+        </section>
+
+        <!-- ================= FOOTER ================= -->
+        <section id="footer" class="panel">
+            <div class="footer-panel-head">
+                <div>
+                    <h1>Footer</h1>
+                    <p>Edit the shared storefront footer used across all customer pages.</p>
+                </div>
+                <button type="button" class="footer-preview-btn" onclick="loadFooterSettings()">Refresh</button>
+            </div>
+
+            <div class="footer-admin-grid">
+                <section class="footer-admin-card">
+                    <h2>Top Messaging</h2>
+                    <div class="footer-form-grid">
+                        <label>
+                            Red Bar Text
+                            <input id="footerHomegrownText" type="text" placeholder="HOMEGROWN INDIAN BRAND">
+                        </label>
+                        <label>
+                            Headline Before
+                            <input id="footerHeadlineBefore" type="text" placeholder="Over">
+                        </label>
+                        <label>
+                            Headline Highlight
+                            <input id="footerHeadlineStrong" type="text" placeholder="6 Million">
+                        </label>
+                        <label>
+                            Headline After
+                            <input id="footerHeadlineAfter" type="text" placeholder="Happy Customers">
+                        </label>
+                    </div>
+                </section>
+
+                <section class="footer-admin-card">
+                    <h2>Brand Copy</h2>
+                    <div class="footer-form-grid one">
+                        <label>
+                            Brand Title
+                            <input id="footerBrandTitle" type="text" placeholder="Unspoken Store">
+                        </label>
+                        <label>
+                            Brand Description
+                            <textarea id="footerBrandDescription" rows="4" placeholder="Short footer introduction"></textarea>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="footer-admin-card wide">
+                    <div class="footer-card-title-row">
+                        <h2>Link Columns</h2>
+                        <button type="button" onclick="addFooterSection()">Add Column</button>
+                    </div>
+                    <div id="footerSectionsEditor" class="footer-editor-stack"></div>
+                </section>
+
+                <section class="footer-admin-card wide">
+                    <div class="footer-card-title-row">
+                        <h2>Trust Rows</h2>
+                        <button type="button" onclick="addFooterFeature()">Add Row</button>
+                    </div>
+                    <div id="footerFeaturesEditor" class="footer-editor-stack compact"></div>
+                </section>
+
+                <section class="footer-admin-card">
+                    <div class="footer-card-title-row">
+                        <h2>App Buttons</h2>
+                        <button type="button" onclick="addFooterAppButton()">Add App</button>
+                    </div>
+                    <label>
+                        App Title
+                        <input id="footerAppTitle" type="text" placeholder="Experience the Unspoken Store app">
+                    </label>
+                    <div id="footerAppButtonsEditor" class="footer-editor-stack compact"></div>
+                </section>
+
+                <section class="footer-admin-card">
+                    <div class="footer-card-title-row">
+                        <h2>Social Links</h2>
+                        <button type="button" onclick="addFooterSocial()">Add Social</button>
+                    </div>
+                    <div id="footerSocialsEditor" class="footer-editor-stack compact"></div>
+                </section>
+
+                <section class="footer-admin-card wide">
+                    <h2>Expandable Info</h2>
+                    <div class="footer-form-grid one">
+                        <label>
+                            Info Title
+                            <input id="footerInfoTitle" type="text" placeholder="Who we are">
+                        </label>
+                        <label>
+                            Info Body
+                            <textarea id="footerInfoBody" rows="4" placeholder="About the brand"></textarea>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="footer-admin-card wide">
+                    <h2>Payment & Shipping</h2>
+                    <div class="footer-form-grid two">
+                        <label>
+                            Payment Label
+                            <input id="footerPaymentText" type="text" placeholder="100% secure payment">
+                        </label>
+                        <label>
+                            Payment Items
+                            <input id="footerPaymentItems" type="text" placeholder="PhonePe, GPay, Paytm">
+                        </label>
+                        <label>
+                            Shipping Label
+                            <input id="footerShippingText" type="text" placeholder="Shipping partners">
+                        </label>
+                        <label>
+                            Shipping Items
+                            <input id="footerShippingItems" type="text" placeholder="DTDC, Delhivery">
+                        </label>
+                        <label class="full">
+                            Copyright Text
+                            <input id="footerCopyrightText" type="text" placeholder="© Unspoken Store 2026-27">
+                        </label>
+                    </div>
+                </section>
+            </div>
+
+            <p id="footerAdminFeedback" class="footer-admin-feedback"></p>
+            <div class="footer-save-bar">
+                <button type="button" onclick="saveFooterSettings()">Save Footer</button>
+            </div>
         </section>
 
         <!-- ================= CUSTOM DESIGN REQUESTS ================= -->

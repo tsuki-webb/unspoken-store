@@ -13,6 +13,7 @@ const cartRoutes = require("./routes/cartRoutes")
 const customDesignRoutes = require("./routes/customDesignRoutes")
 const orderRoutes = require("./routes/orderRoutes")
 const wishlistRoutes = require("./routes/wishlistRoutes")
+const footerRoutes = require("./routes/footerRoutes")
 
 const app = express()
 const PORT = Number(process.env.PORT || 3000)
@@ -35,6 +36,7 @@ app.use("/api/cart", cartRoutes)
 app.use("/api/custom-designs", customDesignRoutes)
 app.use("/api/orders", orderRoutes)
 app.use("/api/wishlist", wishlistRoutes)
+app.use("/api/footer", footerRoutes)
 
 // ✅ STATIC
 app.use(express.static("public"))

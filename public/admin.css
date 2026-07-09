@@ -1442,6 +1442,240 @@ h3{
     background: #ffdede;
 }
 
+/* ================= FOOTER ADMIN ================= */
+
+.footer-panel-head,
+.footer-card-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.footer-panel-head {
+    margin-bottom: 20px;
+}
+
+.footer-panel-head p {
+    margin: 8px 0 0;
+    color: var(--muted);
+}
+
+.footer-preview-btn,
+.footer-card-title-row button,
+.footer-small-action,
+.footer-link-row button,
+.footer-icon-row button,
+.footer-save-bar button {
+    border: none;
+    border-radius: 12px;
+    background: #111;
+    color: #fff;
+    min-height: 42px;
+    padding: 0 16px;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.footer-card-title-row button,
+.footer-small-action,
+.footer-link-row button,
+.footer-icon-row button {
+    background: rgba(17, 17, 17, 0.08);
+    color: #191919;
+}
+
+.footer-admin-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.footer-admin-card {
+    min-width: 0;
+    padding: 22px;
+    border: 1px solid rgba(17, 17, 17, 0.08);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 14px 34px rgba(18, 16, 12, 0.05);
+}
+
+.footer-admin-card.wide {
+    grid-column: 1 / -1;
+}
+
+.footer-admin-card h2 {
+    margin: 0 0 16px;
+    font-size: 18px;
+    line-height: 1.2;
+}
+
+.footer-admin-card label {
+    min-width: 0;
+    display: grid;
+    gap: 8px;
+    color: #454545;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.footer-admin-card input,
+.footer-admin-card textarea {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fff;
+    color: var(--text);
+    padding: 12px 13px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.footer-admin-card textarea {
+    resize: vertical;
+}
+
+.footer-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.footer-form-grid.one {
+    grid-template-columns: 1fr;
+}
+
+.footer-form-grid.two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.footer-form-grid .full {
+    grid-column: 1 / -1;
+}
+
+.footer-editor-stack {
+    display: grid;
+    gap: 14px;
+}
+
+.footer-editor-stack.compact {
+    margin-top: 14px;
+}
+
+.footer-edit-block {
+    padding: 14px;
+    border: 1px solid rgba(17, 17, 17, 0.08);
+    border-radius: 14px;
+    background: #faf8f4;
+}
+
+.footer-edit-block-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 12px;
+}
+
+.footer-link-list {
+    display: grid;
+    gap: 10px;
+}
+
+.footer-link-row,
+.footer-icon-row {
+    display: grid;
+    grid-template-columns: minmax(120px, 1fr) minmax(160px, 1.4fr) auto;
+    gap: 10px;
+    align-items: center;
+}
+
+.footer-icon-row {
+    grid-template-columns: 76px minmax(140px, 1fr) minmax(160px, 1fr) auto;
+}
+
+.footer-small-action {
+    width: fit-content;
+    margin-top: 12px;
+}
+
+.footer-admin-feedback {
+    min-height: 24px;
+    margin: 18px 0 10px;
+    color: var(--muted);
+    font-weight: 700;
+}
+
+.footer-admin-feedback[data-tone="success"] {
+    color: #167a42;
+}
+
+.footer-admin-feedback[data-tone="error"] {
+    color: #c43b24;
+}
+
+.footer-save-bar {
+    position: sticky;
+    bottom: 0;
+    z-index: 4;
+    padding: 14px 0 0;
+    background: linear-gradient(180deg, rgba(247, 239, 229, 0), #f7efe5 38%);
+    display: flex;
+    justify-content: flex-end;
+}
+
+.footer-save-bar button {
+    min-width: 180px;
+    background: linear-gradient(135deg, var(--brand-accent) 0%, var(--brand-accent-strong) 100%);
+    box-shadow: 0 12px 26px rgba(226, 46, 12, 0.24);
+}
+
+@media (max-width: 980px) {
+    .footer-admin-grid,
+    .footer-form-grid,
+    .footer-form-grid.two {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-link-row,
+    .footer-icon-row {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-link-row button,
+    .footer-icon-row button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 640px) {
+    .footer-panel-head,
+    .footer-card-title-row {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .footer-edit-block-head {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-preview-btn,
+    .footer-card-title-row button,
+    .footer-save-bar button {
+        width: 100%;
+    }
+
+    .footer-admin-card {
+        padding: 16px;
+        border-radius: 14px;
+    }
+
+    .footer-save-bar {
+        justify-content: stretch;
+    }
+}
+
 /* optional little label look */
 .banner-card::after {
     content: "Banner";

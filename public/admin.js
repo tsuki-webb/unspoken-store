@@ -36,6 +36,7 @@ let categoryCardCache = []
 let categoryCardReorderBusy = false
 let draggingCategoryCardId = ""
 let draggingCategoryCardGender = ""
+let footerSettingsDraft = null
 
 const imageCompression = window.imageCompression
 const FIT_REQUIRED_TYPE = "tshirt"
@@ -123,10 +124,71 @@ const VALID_ADMIN_PANELS = new Set([
     "products",
     "banners",
     "categorycards",
+    "footer",
     "customdesigns",
     "orders",
     "users"
 ])
+const DEFAULT_FOOTER_SETTINGS = {
+    homegrownText: "HOMEGROWN INDIAN BRAND",
+    headlineBefore: "Over",
+    headlineStrong: "6 Million",
+    headlineAfter: "Happy Customers",
+    brandTitle: "Unspoken Store",
+    brandDescription: "Premium streetwear, custom tees, curated drops, and a clean shopping experience built for every screen.",
+    linkSections: [
+        {
+            title: "Need Help",
+            items: [
+                { label: "Contact Us", href: "index.html#footerContact" },
+                { label: "Track Order", href: "orders.html" },
+                { label: "Returns & Refunds", href: "orders.html" },
+                { label: "FAQs", href: "index.html#footerContact" },
+                { label: "My Account", href: "index.html" }
+            ]
+        },
+        {
+            title: "Company",
+            items: [
+                { label: "About Us", href: "index.html#footerContact" },
+                { label: "Custom Studio", href: "custom-design.html" },
+                { label: "New Collection", href: "index.html#featuredProducts" },
+                { label: "Gift Vouchers", href: "index.html#footerContact" }
+            ]
+        },
+        {
+            title: "More Info",
+            items: [
+                { label: "Terms & Conditions", href: "index.html#footerContact" },
+                { label: "Privacy Policy", href: "index.html#footerContact" },
+                { label: "Sitemap", href: "index.html" },
+                { label: "Blogs", href: "index.html#footerContact" }
+            ]
+        }
+    ],
+    featureRows: [
+        { icon: "Rs", label: "COD Available", href: "" },
+        { icon: "↻", label: "30 Days Easy Returns & Exchanges", href: "" }
+    ],
+    appTitle: "Experience the Unspoken Store app",
+    appButtons: [
+        { label: "Google Play", href: "#", badge: "Get it on" },
+        { label: "App Store", href: "#", badge: "Download on the" }
+    ],
+    socialLinks: [
+        { label: "Facebook", href: "#", icon: "f" },
+        { label: "Instagram", href: "#", icon: "ig" },
+        { label: "Snapchat", href: "#", icon: "sc" },
+        { label: "X", href: "#", icon: "x" }
+    ],
+    infoTitle: "Who we are",
+    infoBody: "Unspoken Store creates premium everyday streetwear with thoughtful fits, responsive support, and custom design workflows for production-ready apparel.",
+    paymentText: "100% secure payment",
+    paymentItems: ["PhonePe", "GPay", "Amazon Pay", "Mastercard", "Mobikwik", "Paytm", "Razorpay", "Cash on Delivery"],
+    shippingText: "Shipping partners",
+    shippingItems: ["DTDC", "Delhivery", "Ecom Express", "Xpressbees"],
+    copyrightText: "© Unspoken Store 2026-27"
+}
 
 function requiresFit(type) {
     return type === FIT_REQUIRED_TYPE
@@ -489,6 +551,11 @@ function switchPanel(panelId, btn = null, options = {}) {
 
     if (normalizedPanelId === "categorycards") {
         loadCategoryCards()
+        return
+    }
+
+    if (normalizedPanelId === "footer") {
+        loadFooterSettings()
         return
     }
 
@@ -2398,6 +2465,267 @@ async function loadOrders() {
     }
 }
 
+// ================= FOOTER =================
+
+function mergeFooterSettings(settings = {}) {
+    const data = settings && typeof settings === "object" ? settings : {}
+    return {
+        ...DEFAULT_FOOTER_SETTINGS,
+        ...data,
+        linkSections: Array.isArray(data.linkSections) && data.linkSections.length ? data.linkSections : DEFAULT_FOOTER_SETTINGS.linkSections,
+        featureRows: Array.isArray(data.featureRows) && data.featureRows.length ? data.featureRows : DEFAULT_FOOTER_SETTINGS.featureRows,
+        appButtons: Array.isArray(data.appButtons) && data.appButtons.length ? data.appButtons : DEFAULT_FOOTER_SETTINGS.appButtons,
+        socialLinks: Array.isArray(data.socialLinks) && data.socialLinks.length ? data.socialLinks : DEFAULT_FOOTER_SETTINGS.socialLinks,
+        paymentItems: Array.isArray(data.paymentItems) && data.paymentItems.length ? data.paymentItems : DEFAULT_FOOTER_SETTINGS.paymentItems,
+        shippingItems: Array.isArray(data.shippingItems) && data.shippingItems.length ? data.shippingItems : DEFAULT_FOOTER_SETTINGS.shippingItems
+    }
+}
+
+function splitAdminList(value) {
+    return String(value || "")
+        .split(",")
+        .map(item => item.trim())
+        .filter(Boolean)
+}
+
+function setFooterFeedback(message = "", tone = "muted") {
+    const feedback = document.getElementById("footerAdminFeedback")
+    if (!feedback) return
+    feedback.textContent = message
+    feedback.dataset.tone = tone
+}
+
+function setInputValue(id, value) {
+    const input = document.getElementById(id)
+    if (input) input.value = value || ""
+}
+
+function renderFooterSectionsEditor(sections = []) {
+    const container = document.getElementById("footerSectionsEditor")
+    if (!container) return
+
+    const normalized = Array.isArray(sections) && sections.length ? sections : [{ title: "", items: [] }]
+    container.innerHTML = normalized.map((section, sectionIndex) => {
+        const items = Array.isArray(section.items) && section.items.length ? section.items : [{ label: "", href: "" }]
+        return `
+            <article class="footer-edit-block" data-footer-section>
+                <div class="footer-edit-block-head">
+                    <label>
+                        Column Title
+                        <input type="text" data-footer-section-title value="${escapeHtml(section.title || "")}" placeholder="Need Help">
+                    </label>
+                    <button type="button" onclick="removeFooterEditorBlock(this)">Remove Column</button>
+                </div>
+                <div class="footer-link-list">
+                    ${items.map(item => renderFooterLinkRow(item)).join("")}
+                </div>
+                <button type="button" class="footer-small-action" onclick="addFooterLinkRow(this)">Add Link</button>
+            </article>
+        `
+    }).join("")
+}
+
+function renderFooterLinkRow(item = {}) {
+    return `
+        <div class="footer-link-row" data-footer-link-row>
+            <input type="text" data-footer-link-label value="${escapeHtml(item.label || "")}" placeholder="Label">
+            <input type="text" data-footer-link-href value="${escapeHtml(item.href || "")}" placeholder="index.html#section">
+            <button type="button" onclick="removeFooterEditorBlock(this)">Remove</button>
+        </div>
+    `
+}
+
+function renderIconEditor(containerId, rows = [], type = "feature") {
+    const container = document.getElementById(containerId)
+    if (!container) return
+
+    const normalized = Array.isArray(rows) && rows.length ? rows : [{ icon: "", label: "", href: "" }]
+    container.innerHTML = normalized.map(row => `
+        <div class="footer-icon-row" data-footer-${type}-row>
+            <input type="text" data-footer-icon value="${escapeHtml(row.icon || "")}" placeholder="Icon">
+            <input type="text" data-footer-label value="${escapeHtml(row.label || "")}" placeholder="Label">
+            <input type="text" data-footer-href value="${escapeHtml(row.href || "")}" placeholder="Link (optional)">
+            <button type="button" onclick="removeFooterEditorBlock(this)">Remove</button>
+        </div>
+    `).join("")
+}
+
+function renderAppButtonsEditor(buttons = []) {
+    const container = document.getElementById("footerAppButtonsEditor")
+    if (!container) return
+
+    const normalized = Array.isArray(buttons) && buttons.length ? buttons : [{ badge: "", label: "", href: "" }]
+    container.innerHTML = normalized.map(button => `
+        <div class="footer-icon-row" data-footer-app-row>
+            <input type="text" data-footer-app-badge value="${escapeHtml(button.badge || "")}" placeholder="Badge">
+            <input type="text" data-footer-app-label value="${escapeHtml(button.label || "")}" placeholder="App name">
+            <input type="text" data-footer-app-href value="${escapeHtml(button.href || "")}" placeholder="Link">
+            <button type="button" onclick="removeFooterEditorBlock(this)">Remove</button>
+        </div>
+    `).join("")
+}
+
+function hydrateFooterForm(settings) {
+    const footer = mergeFooterSettings(settings)
+    footerSettingsDraft = footer
+
+    setInputValue("footerHomegrownText", footer.homegrownText)
+    setInputValue("footerHeadlineBefore", footer.headlineBefore)
+    setInputValue("footerHeadlineStrong", footer.headlineStrong)
+    setInputValue("footerHeadlineAfter", footer.headlineAfter)
+    setInputValue("footerBrandTitle", footer.brandTitle)
+    setInputValue("footerBrandDescription", footer.brandDescription)
+    setInputValue("footerAppTitle", footer.appTitle)
+    setInputValue("footerInfoTitle", footer.infoTitle)
+    setInputValue("footerInfoBody", footer.infoBody)
+    setInputValue("footerPaymentText", footer.paymentText)
+    setInputValue("footerPaymentItems", footer.paymentItems.join(", "))
+    setInputValue("footerShippingText", footer.shippingText)
+    setInputValue("footerShippingItems", footer.shippingItems.join(", "))
+    setInputValue("footerCopyrightText", footer.copyrightText)
+
+    renderFooterSectionsEditor(footer.linkSections)
+    renderIconEditor("footerFeaturesEditor", footer.featureRows, "feature")
+    renderAppButtonsEditor(footer.appButtons)
+    renderIconEditor("footerSocialsEditor", footer.socialLinks, "social")
+}
+
+function collectFooterSections() {
+    return Array.from(document.querySelectorAll("[data-footer-section]")).map(section => {
+        const title = normalizeText(section.querySelector("[data-footer-section-title]")?.value)
+        const items = Array.from(section.querySelectorAll("[data-footer-link-row]")).map(row => ({
+            label: normalizeText(row.querySelector("[data-footer-link-label]")?.value),
+            href: normalizeText(row.querySelector("[data-footer-link-href]")?.value) || "#"
+        })).filter(item => item.label)
+
+        return { title, items }
+    }).filter(section => section.title || section.items.length)
+}
+
+function collectFooterIconRows(selector) {
+    return Array.from(document.querySelectorAll(selector)).map(row => ({
+        icon: normalizeText(row.querySelector("[data-footer-icon]")?.value),
+        label: normalizeText(row.querySelector("[data-footer-label]")?.value),
+        href: normalizeText(row.querySelector("[data-footer-href]")?.value)
+    })).filter(item => item.label)
+}
+
+function collectFooterAppButtons() {
+    return Array.from(document.querySelectorAll("[data-footer-app-row]")).map(row => ({
+        badge: normalizeText(row.querySelector("[data-footer-app-badge]")?.value),
+        label: normalizeText(row.querySelector("[data-footer-app-label]")?.value),
+        href: normalizeText(row.querySelector("[data-footer-app-href]")?.value) || "#"
+    })).filter(item => item.label)
+}
+
+function collectFooterPayload() {
+    return {
+        homegrownText: normalizeText(document.getElementById("footerHomegrownText")?.value),
+        headlineBefore: normalizeText(document.getElementById("footerHeadlineBefore")?.value),
+        headlineStrong: normalizeText(document.getElementById("footerHeadlineStrong")?.value),
+        headlineAfter: normalizeText(document.getElementById("footerHeadlineAfter")?.value),
+        brandTitle: normalizeText(document.getElementById("footerBrandTitle")?.value),
+        brandDescription: normalizeText(document.getElementById("footerBrandDescription")?.value),
+        linkSections: collectFooterSections(),
+        featureRows: collectFooterIconRows("[data-footer-feature-row]"),
+        appTitle: normalizeText(document.getElementById("footerAppTitle")?.value),
+        appButtons: collectFooterAppButtons(),
+        socialLinks: collectFooterIconRows("[data-footer-social-row]"),
+        infoTitle: normalizeText(document.getElementById("footerInfoTitle")?.value),
+        infoBody: normalizeText(document.getElementById("footerInfoBody")?.value),
+        paymentText: normalizeText(document.getElementById("footerPaymentText")?.value),
+        paymentItems: splitAdminList(document.getElementById("footerPaymentItems")?.value),
+        shippingText: normalizeText(document.getElementById("footerShippingText")?.value),
+        shippingItems: splitAdminList(document.getElementById("footerShippingItems")?.value),
+        copyrightText: normalizeText(document.getElementById("footerCopyrightText")?.value)
+    }
+}
+
+function addFooterSection() {
+    const sections = collectFooterSections()
+    sections.push({ title: "", items: [{ label: "", href: "" }] })
+    renderFooterSectionsEditor(sections)
+}
+
+function addFooterLinkRow(button) {
+    const list = button?.closest("[data-footer-section]")?.querySelector(".footer-link-list")
+    if (!list) return
+    list.insertAdjacentHTML("beforeend", renderFooterLinkRow())
+}
+
+function addFooterFeature() {
+    const rows = collectFooterIconRows("[data-footer-feature-row]")
+    rows.push({ icon: "", label: "", href: "" })
+    renderIconEditor("footerFeaturesEditor", rows, "feature")
+}
+
+function addFooterAppButton() {
+    const rows = collectFooterAppButtons()
+    rows.push({ badge: "", label: "", href: "" })
+    renderAppButtonsEditor(rows)
+}
+
+function addFooterSocial() {
+    const rows = collectFooterIconRows("[data-footer-social-row]")
+    rows.push({ icon: "", label: "", href: "" })
+    renderIconEditor("footerSocialsEditor", rows, "social")
+}
+
+function removeFooterEditorBlock(button) {
+    const block = button?.closest("[data-footer-section], [data-footer-link-row], [data-footer-feature-row], [data-footer-app-row], [data-footer-social-row]")
+    if (block) block.remove()
+}
+
+async function loadFooterSettings() {
+    setFooterFeedback("Loading footer settings...", "muted")
+
+    try {
+        const response = await fetch("/api/footer")
+        const payload = await response.json().catch(() => ({}))
+        if (!response.ok) {
+            throw new Error(payload?.error || "Unable to load footer")
+        }
+
+        hydrateFooterForm(payload)
+        setFooterFeedback("Footer settings loaded.", "success")
+    } catch (err) {
+        console.log("Footer settings load error:", err)
+        hydrateFooterForm(footerSettingsDraft || DEFAULT_FOOTER_SETTINGS)
+        setFooterFeedback("Using default footer settings until the server responds.", "error")
+    }
+}
+
+async function saveFooterSettings() {
+    const payload = collectFooterPayload()
+    if (!payload.linkSections.length) {
+        alert("Add at least one footer link column.")
+        return
+    }
+
+    setFooterFeedback("Saving footer settings...", "muted")
+
+    try {
+        const response = await fetch("/api/footer", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        })
+
+        const saved = await response.json().catch(() => ({}))
+        if (!response.ok) {
+            throw new Error(saved?.error || "Unable to save footer")
+        }
+
+        hydrateFooterForm(saved)
+        setFooterFeedback("Footer saved. Storefront pages will use the updated content.", "success")
+    } catch (err) {
+        console.log("Footer settings save error:", err)
+        setFooterFeedback(err?.message || "Unable to save footer right now.", "error")
+    }
+}
+
 // ================= USERS =================
 
 function getUserProviderLabel(provider) {
@@ -2681,6 +3009,15 @@ window.handleUserFiltersChanged = handleUserFiltersChanged
 window.exportUsersCsv = exportUsersCsv
 window.copyUserEmail = copyUserEmail
 
+window.loadFooterSettings = loadFooterSettings
+window.saveFooterSettings = saveFooterSettings
+window.addFooterSection = addFooterSection
+window.addFooterLinkRow = addFooterLinkRow
+window.addFooterFeature = addFooterFeature
+window.addFooterAppButton = addFooterAppButton
+window.addFooterSocial = addFooterSocial
+window.removeFooterEditorBlock = removeFooterEditorBlock
+
 // ================= INIT =================
 
 function initAdmin() {
@@ -2719,6 +3056,7 @@ function initAdmin() {
     loadProducts()
     loadBanners()
     loadCategoryCards()
+    loadFooterSettings()
     loadCustomDesignRequests()
     loadOrders()
     loadUsers()
